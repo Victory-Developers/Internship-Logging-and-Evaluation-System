@@ -10,7 +10,7 @@ from .serializers import PlacementSerializer, PlacementCreateSerializer
 from apps.shared_permissions import IsAdmin, IsStudent, IsActiveUser
 
 
-# ─── Admin: full CRU ─────────────────────────────────────────────────────────
+# ─── Admin: full  ─────────────────────────────────────────────────────────
 
 class PlacementListCreateView(generics.ListCreateAPIView):
     """
