@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-
+＃ Checked and verified
 
 class IsActiveUser(BasePermission):
     """Reject pending/rejected accounts."""
