@@ -4,7 +4,7 @@ from django.conf import settings
 
 class WeeklyLog(models.Model):
     """
-    A wekly activity log submitted by a student.
+    A weekly activity log submitted by a student.
     Lifecycle: draft → submitted → reviewed → approved (or rejected back to draft).
     """
 
