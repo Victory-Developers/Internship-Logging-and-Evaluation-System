@@ -13,7 +13,7 @@ class WeeklyLog(models.Model):
         ('submitted', 'Submitted'),
         ('reviewed',  'Reviewed'),      # workplace supervisor has commented
         ('approved',  'Approved'),      # workplace supervisor approved
-        ('rejected',  'Rejected'),      # sent back for revision
+        ('rejected',  'Rejected'),      # sent back for revisio
     ]
 
     placement    = models.ForeignKey(
