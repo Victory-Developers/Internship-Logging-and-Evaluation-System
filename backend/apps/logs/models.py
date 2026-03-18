@@ -11,8 +11,8 @@ class WeeklyLog(models.Model):
     STATUS_CHOICES = [
         ('draft',     'Draft'),
         ('submitted', 'Submitted'),
-        ('reviewed',  'Reviewed'),      # workplace supervisor has commented
-        ('approved',  'Approved'),      # workplace supervisor approved
+        ('reviewed',  'Reviewed'),      # workplace superviso has 
+        ('approved',  'Approved'),      # workplace supervisor 
         ('rejected',  'Rejected'),      # sent back for revision
     ]
 
