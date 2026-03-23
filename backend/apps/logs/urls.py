@@ -22,7 +22,7 @@ urlpatterns = [
     path('supervisor/',                      WorkplaceLogListView.as_view(),     name='workplace-log-list'),
     path('supervisor/<int:pk>/review/',      WorkplaceLogReviewView.as_view(),   name='workplace-log-review'),
 
-    # Academic supervisor
+    # Academic superviso
     path('academic/',                        AcademicLogListView.as_view(),      name='academic-log-list'),
 
     # Admin
