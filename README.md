@@ -11,10 +11,12 @@ The initial phase of ILES will focus on backend services, implementing core modu
 1. **User & Role Management** – registration, authentication, and permission handling for Student Interns, Workplace Supervisors, Academic Supervisors, and Internship Administrators.
 2. **Internship Placement Module** – tracking placement details such as start/end dates, host organization, and assigned supervisor.
 3. **Weekly Logbook Module** – enabling interns to submit weekly activity logs and attach supporting documents.
-4. **Supervisor Review Workflow** – workflow for workplace and academic supervisors to review logbooks and provide comments.
-5. **Academic Evaluation Module** – collection of final evaluations, grades, and remarks from academic supervisors.
-6. **Weighted Score Computation** – algorithmic calculation of an overall score based on logbooks, reviews, and evaluations.
-7. **Dashboards & Reporting** – endpoints exposing summary statistics, progress charts, and downloadable reports for administrators.
+
+To be continued...
+5. **Supervisor Review Workflow** – workflow for workplace and academic supervisors to review logbooks and provide comments.
+6. **Academic Evaluation Module** – collection of final evaluations, grades, and remarks from academic supervisors.
+7. **Weighted Score Computation** – algorithmic calculation of an overall score based on logbooks, reviews, and evaluations.
+8. **Dashboards & Reporting** – endpoints exposing summary statistics, progress charts, and downloadable reports for administrators.
 
 > ⚙️ The backend will be built with Django, providing RESTful APIs. Frontend and deployment will be addressed in subsequent phases.
 
