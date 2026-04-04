@@ -5,116 +5,96 @@ import heroImg from './assets/hero.png'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeRole, setActiveRole] = useState('Student')
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="login-page">
+      <section className="hero-side">
+        <div className='hero-title'>
+          <h1>
+            ILES
+          </h1>
+          <h4>Internship Logging & Evaluation System</h4>
         </div>
-        <div>
-          <h1>Get started</h1>
+        <div className='title-underline'></div>
+        <div className='hero-content'>
+          <p>Track weekly logs</p>
+          <p>Manage evaluations</p>
+          <p>Monitor progress</p>          
+        </div>
+      </section>
+
+      <section className="form-side">
+        <div className='page-title'>
+          <h1>Welcome Back</h1>
+          <h4>Sign into your account</h4>
+        </div>
+        <div className="role-selector">
+          <button 
+            className={activeRole === 'Student' ? 'active-btn' : 'inactive-btn'}
+            onClick={() => setActiveRole('Student')}
+          >
+            Student
+          </button>
+          <button
+            className={activeRole === 'Supervisor' ? 'active-btn' : 'inactive-btn'}
+            onClick={() => setActiveRole('Supervisor')}>
+            Supervisor
+          </button>
+          <button
+            className={activeRole === 'Administrator' ? 'active-btn' : 'inactive-btn'}
+            onClick={() => setActiveRole('Administrator')}
+          >
+            Administrator
+          </button>
+        </div>
+        <div className="email-input">
+          <label> UNIVERSITY EMAIL </label>
+          <input type="email" placeholder={activeRole === 'Student' ? 'john.doe@students.mak.ac.ug' : 'staff.member@mak.ac.ug'}></input>
+        </div>
+
+        <div className="password-input">
+          <div className='label-group'>
+            <label> PASSWORD </label>
+            <a href=''>Forgot password?</a>
+          </div>
+          <div className='input-group'>
+            <input type="password" placeholder="· · · · · · · · · · ·"></input>
+          </div>
+        </div>
+
+        <div className="signin-button">
+          <button>Sign In</button>
+        </div>
+
+        <div className='alt-login'>
           <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+            <label> Or continue with </label>
           </p>
+          
+          <button>Gmail</button>
+          <button>Phone Number</button>
         </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+
+        <div className='sign-up'>
+          <label>Don't have an account?</label>
+          <a href=''>SIgn Up</a>
+        </div>
+
+        <footer>
+          <p>
+            © 2026 ILES
+          </p>
+          <p>
+            <a href=''>TERMS</a>
+            <a href=''>PRIVACY</a>
+            <a href=''>HELP</a>
+          </p>
+        </footer>
+        
+        
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
