@@ -41,7 +41,7 @@ export default function App() {
   return (
     <Routes>
 
-      {/* ─── Public routes ─── */}
+      {/* Public routes */}
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to={getDashboardPath()} replace 
@@ -53,7 +53,7 @@ export default function App() {
 /> : <RegisterPage />}
       />
 
-      {/* ─── Student routes ─── */}
+      {/* Student routes */}
       <Route
         path="/student"
         element={
@@ -72,7 +72,7 @@ export default function App() {
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
-      {/* ─── Academic Supervisor routes ─── */}
+      {/* Academic Supervisor routes */}
       <Route
         path="/supervisor"
         element={
@@ -92,7 +92,7 @@ export default function App() {
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
-      {/* ─── Admin routes ─── */}
+      {/* Admin routes */}
       <Route
         path="/admin"
         element={
@@ -109,7 +109,7 @@ export default function App() {
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
-      {/* ─── Fallbacks ─── */}
+      {/* Fallbacks */}
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
 
