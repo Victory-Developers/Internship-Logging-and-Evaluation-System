@@ -1,101 +1,118 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import useAuth from './hooks/useAuth';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
-  const [activeRole, setActiveRole] = useState('Student')
+// Auth pages
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
+// Student pages
+import StudentDashboard from './pages/student/Dashboard';
+import StudentPlacement from './pages/student/Placement';
+import StudentWeeklyLogs from './pages/student/WeeklyLogs';
+import StudentCreateLog from './pages/student/CreateLog';
+import StudentEditLog from './pages/student/EditLog';
+import StudentViewLog from './pages/student/ViewLog';
+import StudentScores from './pages/student/Scores';
+
+// Academic Supervisor pages
+import SupervisorDashboard from './pages/supervisor/Dashboard';
+import SupervisorStudents from './pages/supervisor/Students';
+import SupervisorPendingReviews from './pages/supervisor/PendingReviews';
+import SupervisorReviewLog from './pages/supervisor/ReviewLog';
+import SupervisorScoresOverview from './pages/supervisor/ScoresOverview';
+import SupervisorEvaluationForm from './pages/supervisor/EvaluationForm';
+
+// Admin pages
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminUsers from './pages/admin/Users';
+import AdminPlacements from './pages/admin/Placements';
+import AdminCreatePlacement from './pages/admin/CreatePlacement';
+import AdminReports from './pages/admin/Reports';
+
+// Layouts
+import StudentLayout from './layouts/StudentLayout';
+import SupervisorLayout from './layouts/SupervisorLayout';
+import AdminLayout from './layouts/AdminLayout';
+
+export default function App() {
+  const { getDashboardPath, isAuthenticated } = useAuth();
 
   return (
-    <main className="login-page">
-      <section className="hero-side">
-        <div className='hero-title'>
-          <h1>
-            ILES
-          </h1>
-          <h4>Internship Logging & Evaluation System</h4>
-        </div>
-        <div className='title-underline'></div>
-        <div className='hero-content'>
-          <p>Track weekly logs</p>
-          <p>Manage evaluations</p>
-          <p>Monitor progress</p>          
-        </div>
-      </section>
+    <Routes>
 
-      <section className="form-side">
-        <div className='page-title'>
-          <h1>Welcome Back</h1>
-          <h4>Sign into your account</h4>
-        </div>
-        <div className="role-selector">
-          <button 
-            className={activeRole === 'Student' ? 'active-btn' : 'inactive-btn'}
-            onClick={() => setActiveRole('Student')}
-          >
-            Student
-          </button>
-          <button
-            className={activeRole === 'Supervisor' ? 'active-btn' : 'inactive-btn'}
-            onClick={() => setActiveRole('Supervisor')}>
-            Supervisor
-          </button>
-          <button
-            className={activeRole === 'Administrator' ? 'active-btn' : 'inactive-btn'}
-            onClick={() => setActiveRole('Administrator')}
-          >
-            Administrator
-          </button>
-        </div>
-        <div className="email-input">
-          <label> UNIVERSITY EMAIL </label>
-          <input type="email" placeholder={activeRole === 'Student' ? 'john.doe@students.mak.ac.ug' : 'staff.member@mak.ac.ug'}></input>
-        </div>
+      {/* ─── Public routes ─── */}
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to={getDashboardPath()} replace 
+/> : <LoginPage />}
+      />
+      <Route
+        path="/register"
+        element={isAuthenticated ? <Navigate to={getDashboardPath()} replace 
+/> : <RegisterPage />}
+      />
 
-        <div className="password-input">
-          <div className='label-group'>
-            <label> PASSWORD </label>
-            <a href=''>Forgot password?</a>
-          </div>
-          <div className='input-group'>
-            <input type="password" placeholder="· · · · · · · · · · ·"></input>
-          </div>
-        </div>
+      {/* ─── Student routes ─── */}
+      <Route
+        path="/student"
+        element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard" element={<StudentDashboard />} />
+        <Route path="placement" element={<StudentPlacement />} />
+        <Route path="logs" element={<StudentWeeklyLogs />} />
+        <Route path="logs/new" element={<StudentCreateLog />} />
+        <Route path="logs/:id" element={<StudentViewLog />} />
+        <Route path="logs/:id/edit" element={<StudentEditLog />} />
+        <Route path="scores" element={<StudentScores />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+      </Route>
 
-        <div className="signin-button">
-          <button>Sign In</button>
-        </div>
+      {/* ─── Academic Supervisor routes ─── */}
+      <Route
+        path="/supervisor"
+        element={
+          <ProtectedRoute allowedRoles={['academic_supervisor']}>
+            <SupervisorLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard" element={<SupervisorDashboard />} />
+        <Route path="students" element={<SupervisorStudents />} />
+        <Route path="pending-reviews" element={<SupervisorPendingReviews />}
+/>
+        <Route path="review/:id" element={<SupervisorReviewLog />} />
+        <Route path="scores" element={<SupervisorScoresOverview />} />
+        <Route path="evaluate/:placementId" element={<SupervisorEvaluationForm
+  />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+      </Route>
 
-        <div className='alt-login'>
-          <p>
-            <label> Or continue with </label>
-          </p>
-          
-          <button>Gmail</button>
-          <button>Phone Number</button>
-        </div>
+      {/* ─── Admin routes ─── */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="placements" element={<AdminPlacements />} />
+        <Route path="placements/new" element={<AdminCreatePlacement />} />
+        <Route path="reports" element={<AdminReports />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+      </Route>
 
-        <div className='sign-up'>
-          <label>Don't have an account?</label>
-          <a href=''>SIgn Up</a>
-        </div>
+      {/* ─── Fallbacks ─── */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
 
-        <footer>
-          <p>
-            © 2026 ILES
-          </p>
-          <p>
-            <a href=''>TERMS</a>
-            <a href=''>PRIVACY</a>
-            <a href=''>HELP</a>
-          </p>
-        </footer>
-        
-        
-      </section>
-    </main>
-  )
+    </Routes>
+  );
 }
-
-export default App
