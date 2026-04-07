@@ -34,8 +34,7 @@ switch (action.type) {
 const initialState = {                                                        
 user: null,
 isAuthenticated: false,                                                     
-loading: true, // true on first load — we don't know yet if there's a saved 
-token                                                                         
+loading: true, // true on first load — we don't know yet if there's a saved token                                                                         
 };
                                                                             
 export function AuthProvider({ children }) {                                  

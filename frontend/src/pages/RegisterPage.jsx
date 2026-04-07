@@ -142,8 +142,10 @@ return (
         <div className="auth-hero-logo">ILES</div>
         <div className="auth-hero-divider" />
         <p className="auth-hero-tagline">
-            Internship Logging & Evaluation System — track placements,
-            submit weekly logs, and manage evaluations in one place.
+            Internship Logging & Evaluation System
+            <ul>・Track placements</ul>
+            <ul>・Submit weekly logs</ul>
+            <ul>・Manage evaluations in one place</ul>
         </p>
         </div>
     </div>

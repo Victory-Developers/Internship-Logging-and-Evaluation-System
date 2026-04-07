@@ -4,9 +4,9 @@ display: flex;
 min-height: 100vh;
 }
 
-/* HERO SIDE (left) */
+/* HERO SIDE */
 .auth-hero {
-width: 55%;
+width: 65%;
 position: relative;
 display: flex;
 flex-direction: column;

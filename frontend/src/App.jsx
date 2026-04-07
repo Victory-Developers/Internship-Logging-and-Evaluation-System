@@ -16,12 +16,12 @@ import StudentViewLog from './pages/student/ViewLog';
 import StudentScores from './pages/student/Scores';
 
 // Academic Supervisor pages
-import SupervisorDashboard from './pages/supervisor/Dashboard';
-import SupervisorStudents from './pages/supervisor/Students';
-import SupervisorPendingReviews from './pages/supervisor/PendingReviews';
-import SupervisorReviewLog from './pages/supervisor/ReviewLog';
-import SupervisorScoresOverview from './pages/supervisor/ScoresOverview';
-import SupervisorEvaluationForm from './pages/supervisor/EvaluationForm';
+import SupervisorDashboard from './pages/academic-supervisor/Dashboard';
+import SupervisorStudents from './pages/academic-supervisor/Students';
+import SupervisorPendingReviews from './pages/academic-supervisor/PendingReviews';
+import SupervisorReviewLog from './pages/academic-supervisor/ReviewLog';
+import SupervisorScoresOverview from './pages/academic-supervisor/ScoresOverview';
+import SupervisorEvaluationForm from './pages/academic-supervisor/EvaluationForm';
 
 // Admin pages
 import AdminDashboard from './pages/admin/Dashboard';
