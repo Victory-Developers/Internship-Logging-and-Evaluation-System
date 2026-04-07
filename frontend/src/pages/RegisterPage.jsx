@@ -83,7 +83,7 @@ const handleSubmit = async (e) => {
     await api.post(ENDPOINTS.REGISTER, payload);
     setSuccess(true);
     // Redirect to login after 2 seconds
-    setTimeout(() => navigate('/login'), 2000);
+    setTimeout(() => navigate('/login'), 5000);
     } catch (err) {
     if (err.response?.data) {
         const data = err.response.data;
