@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
-// import '../styles/auth.css';
+import '../styles/auth.css';
 
 const ROLE_OPTIONS = [
 { value: 'student', label: 'Student' },
