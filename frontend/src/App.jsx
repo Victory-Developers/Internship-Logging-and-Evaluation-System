@@ -7,33 +7,33 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
 // Student pages
-// import StudentDashboard from './pages/student/Dashboard';
-// import StudentPlacement from './pages/student/Placement';
-// import StudentWeeklyLogs from './pages/student/WeeklyLogs';
-// import StudentCreateLog from './pages/student/CreateLog';
-// import StudentEditLog from './pages/student/EditLog';
-// import StudentViewLog from './pages/student/ViewLog';
-// import StudentScores from './pages/student/Scores';
+import StudentDashboard from './pages/student/Dashboard';
+import StudentPlacement from './pages/student/Placement';
+import StudentWeeklyLogs from './pages/student/WeeklyLogs';
+import StudentCreateLog from './pages/student/CreateLog';
+import StudentEditLog from './pages/student/EditLog';
+import StudentViewLog from './pages/student/ViewLog';
+import StudentScores from './pages/student/Scores';
 
 // Academic Supervisor pages
-// import SupervisorDashboard from './pages/supervisor/Dashboard';
-// import SupervisorStudents from './pages/supervisor/Students';
-// import SupervisorPendingReviews from './pages/supervisor/PendingReviews';
-// import SupervisorReviewLog from './pages/supervisor/ReviewLog';
-// import SupervisorScoresOverview from './pages/supervisor/ScoresOverview';
-// import SupervisorEvaluationForm from './pages/supervisor/EvaluationForm';
+import SupervisorDashboard from './pages/supervisor/Dashboard';
+import SupervisorStudents from './pages/supervisor/Students';
+import SupervisorPendingReviews from './pages/supervisor/PendingReviews';
+import SupervisorReviewLog from './pages/supervisor/ReviewLog';
+import SupervisorScoresOverview from './pages/supervisor/ScoresOverview';
+import SupervisorEvaluationForm from './pages/supervisor/EvaluationForm';
 
 // Admin pages
-// import AdminDashboard from './pages/admin/Dashboard';
-// import AdminUsers from './pages/admin/Users';
-// import AdminPlacements from './pages/admin/Placements';
-// import AdminCreatePlacement from './pages/admin/CreatePlacement';
-// import AdminReports from './pages/admin/Reports';
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminUsers from './pages/admin/Users';
+import AdminPlacements from './pages/admin/Placements';
+import AdminCreatePlacement from './pages/admin/CreatePlacement';
+import AdminReports from './pages/admin/Reports';
 
 // Layouts
-// import StudentLayout from './layouts/StudentLayout';
-// import SupervisorLayout from './layouts/SupervisorLayout';
-// import AdminLayout from './layouts/AdminLayout';
+import StudentLayout from './layouts/StudentLayout';
+import SupervisorLayout from './layouts/SupervisorLayout';
+import AdminLayout from './layouts/AdminLayout';
 
 export default function App() {
   const { getDashboardPath, isAuthenticated } = useAuth();
