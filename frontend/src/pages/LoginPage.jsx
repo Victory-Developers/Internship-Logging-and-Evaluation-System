@@ -54,6 +54,7 @@ export default function LoginPage() {
         <div className="auth-hero-bg" />
         <div className="auth-hero-overlay" />
         <div className="auth-hero-content">
+<<<<<<< CTBen-tech-patch-3
           <div className="auth-hero-logo">ILES</div>
           <div className="auth-hero-divider" />
 
@@ -67,6 +68,18 @@ export default function LoginPage() {
             <li>Submit weekly logs</li>
             <li>Manage evaluations in one place</li>
           </ul>
+=======
+        <div className="auth-hero-logo">ILES</div>
+        <div className="auth-hero-divider" />
+        <div className="auth-hero-container">
+            <p className="auth-hero-tagline">Internship Logging & Evaluation System</p>
+                <ul className="auth-hero-list">
+                    <li>Track placements</li>
+                    <li>Submit weekly logs</li>
+                    <li>Manage evaluations in one place</li>
+                </ul>
+        </div>
+>>>>>>> main
         </div>
       </div>
 
@@ -108,7 +121,11 @@ export default function LoginPage() {
             </div>
 
             <div className="auth-field">
+<<<<<<< CTBen-tech-patch-3
               <div className="auth-field-header">
+=======
+            <div className="auth-field-header">
+>>>>>>> main
                 <label className="auth-label" htmlFor="password">Password</label>
                 <Link to="/forgot-password" className="auth-field-link">
                   Forgot password?
@@ -142,5 +159,9 @@ export default function LoginPage() {
       </div>
 
     </div>
+<<<<<<< CTBen-tech-patch-3
   );
+=======
+);
+>>>>>>> main
 }
