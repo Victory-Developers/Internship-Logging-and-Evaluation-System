@@ -49,12 +49,14 @@ return (
         <div className="auth-hero-content">
         <div className="auth-hero-logo">ILES</div>
         <div className="auth-hero-divider" />
-        <p className="auth-hero-tagline">
-            Internship Logging & Evaluation System
-            <ul>・Track placements</ul>
-            <ul>・Submit weekly logs</ul>
-            <ul>・Manage evaluations in one place</ul>
-        </p>
+        <div className="auth-hero-container">
+            <p className="auth-hero-tagline">Internship Logging & Evaluation System</p>
+                <ul className="auth-hero-list">
+                    <li>Track placements</li>
+                    <li>Submit weekly logs</li>
+                    <li>Manage evaluations in one place</li>
+                </ul>
+        </div>
         </div>
     </div>
 
@@ -97,8 +99,7 @@ return (
 
             <div className="auth-field">
             <div className="auth-field-header">
-                <label className="auth-label" 
-htmlFor="password">Password</label>
+                <label className="auth-label" htmlFor="password">Password</label>
                 <Link to="/forgot-password" className="auth-field-link">
                 Forgot password?
                 </Link>
