@@ -72,7 +72,7 @@ class WeeklyLog(models.Model):
 
 class LogComment(models.Model):
     """
-    A comment left by a workplace or academic supervisor on a weekly log.
+    A comment left  a workplace or academic supervisor on a weekly log.
     """
 
     ROLE_CHOICES = [
