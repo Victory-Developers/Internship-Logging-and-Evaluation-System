@@ -27,7 +27,7 @@ from apps.placements.models import Placement
 
 class StudentLogListCreateView(APIView):
     """
-    GET  /api/logs/my/   — Student: list all own logs
+    GET  /api/logs/my/   — Student: list  own logs
     POST /api/logs/my/   — Student: create a new draft log
     """
     permission_classes = [IsStudent]
