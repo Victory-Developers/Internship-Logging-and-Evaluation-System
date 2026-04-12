@@ -17,3 +17,5 @@ urlpatterns = [
     # Reports
     path('reports/',                  SystemReportView.as_view(), name='admin-system-report'),
 ]
+
+# Investigating whether the path works
