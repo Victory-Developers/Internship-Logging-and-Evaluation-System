@@ -34,6 +34,7 @@ class ApproveUserView(APIView):
     POST /api/admin/users/<id>/approve/   — Admin: approve a pending user
     """
     permission_classes = [IsAdmin]
+    # Checked whether permissions are working or not
 
     @extend_schema(
         responses={
