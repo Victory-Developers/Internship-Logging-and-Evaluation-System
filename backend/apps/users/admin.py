@@ -22,4 +22,4 @@ class CustomUserAdmin(UserAdmin):
             'classes': ('wide',),
             'fields': ('email', 'full_name', 'student_number', 'role', 'organisation', 'status', 'password1', 'password2'),
         }),
-    )
+    ) # Comment needed here
