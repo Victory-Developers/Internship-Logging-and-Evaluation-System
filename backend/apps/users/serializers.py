@@ -83,6 +83,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.status = 'active'
         user.save()
         return user
+        # User needed comprehension here
 
 
 class LoginSerializer(serializers.Serializer):
