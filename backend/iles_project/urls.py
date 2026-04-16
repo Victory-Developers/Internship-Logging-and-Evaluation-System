@@ -21,3 +21,5 @@ urlpatterns = [
     # App routes
     path('api/auth/', include('apps.users.urls')),
 ]
+
+# Check whether routes are functional
