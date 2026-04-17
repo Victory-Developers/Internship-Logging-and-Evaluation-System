@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { logsAPI } from '../services/api'
+import api from '../../api/axios'
+import { ENDPOINTS } from '../../api/config'
 import {
   Navbar, PageLayout, PageBody, Card, Btn, StatusBadge,
   Modal, Spinner, EmptyState, Field, Input, Textarea, toast
 } from '../components/UI'
+
+const logsAPI = {
+  getMyLogs: () => api.get(ENDPOINTS.MY_LOGS),
+  createLog: (payload) => api.post(ENDPOINTS.MY_LOGS, payload),
+  updateLog: (id, payload) => api.patch(ENDPOINTS.MY_LOGS + id + '/', payload),
+  submitLog: (id) => api.post(ENDPOINTS.MY_LOGS + id + '/submit/'),
+  deleteLog: (id) => api.delete(ENDPOINTS.MY_LOGS + id + '/'),
+}
 
 const EMPTY_FORM = {
   week_number: '', date: '', activities_performed: '',
