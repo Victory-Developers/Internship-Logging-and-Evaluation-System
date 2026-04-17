@@ -56,6 +56,7 @@ export default function LoginPage() {
         <div className="auth-hero-content">
           <div className="auth-hero-logo">ILES</div>
           <div className="auth-hero-divider" />
+
           <p className="auth-hero-tagline">
             Internship Logging & Evaluation System
           </p>
@@ -65,6 +66,7 @@ export default function LoginPage() {
             <li>Submit weekly logs</li>
             <li>Manage evaluations in one place</li>
           </ul>
+
         </div>
       </div>
 
@@ -106,8 +108,8 @@ export default function LoginPage() {
             </div>
 
             <div className="auth-field">
-            <div className="auth-field-header">
 
+              <div className="auth-field-header">
                 <label className="auth-label" htmlFor="password">Password</label>
                 <Link to="/forgot-password" className="auth-field-link">
                   Forgot password?
@@ -141,5 +143,5 @@ export default function LoginPage() {
       </div>
 
     </div>
-);
+  );
 }
