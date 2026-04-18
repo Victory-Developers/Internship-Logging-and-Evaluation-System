@@ -23,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'organisation':   {'required': False},
         }
 
-    def validate_role(self, value):
+    def validate_role(self, value): # Validation needed?
         if value == 'admin':
             raise serializers.ValidationError(
                 'Admin accounts cannot be created through public registration.'
@@ -83,6 +83,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.status = 'active'
         user.save()
         return user
+        # User needed comprehension here
 
 
 class LoginSerializer(serializers.Serializer):
