@@ -1,0 +1,70 @@
+import axios from 'axios'
+
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+// Attach JWT token to every request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Handle 401 — token expired
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+// ── Auth ──────────────────────────────────────────────
+export const authAPI = {
+  login: (credentials) => api.post('/api/auth/login/', credentials),
+  logout: () => api.post('/api/auth/logout/'),
+  refresh: (refresh) => api.post('/api/auth/refresh/', { refresh }),
+  me: () => api.get('/api/auth/me/'),
+}
+
+// ── Admin ─────────────────────────────────────────────
+export const adminAPI = {
+  getUsers: (params) => api.get('/api/users/', { params }),
+  approveUser: (id) => api.patch(`/api/users/${id}/approve/`),
+  toggleUserStatus: (id, data) => api.patch(`/api/users/${id}/`, data),
+  getUserById: (id) => api.get(`/api/users/${id}/`),
+  getAllLogs: (params) => api.get('/api/logs/', { params }),
+}
+
+// ── Student Logs ──────────────────────────────────────
+export const logsAPI = {
+  getMyLogs: (params) => api.get('/api/logs/my/', { params }),
+  getLogById: (id) => api.get(`/api/logs/${id}/`),
+  createLog: (data) => api.post('/api/logs/', data),
+  updateLog: (id, data) => api.patch(`/api/logs/${id}/`, data),
+  deleteLog: (id) => api.delete(`/api/logs/${id}/`),
+  submitLog: (id) => api.patch(`/api/logs/${id}/submit/`),
+}
+
+// ── Supervisor ────────────────────────────────────────
+export const supervisorAPI = {
+  getSubmittedLogs: (params) => api.get('/api/logs/submitted/', { params }),
+  reviewLog: (id, data) => api.patch(`/api/logs/${id}/review/`, data),
+  getStudents: () => api.get('/api/users/?role=student'),
+}
+
+export default api
