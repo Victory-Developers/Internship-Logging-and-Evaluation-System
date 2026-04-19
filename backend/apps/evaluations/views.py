@@ -292,3 +292,80 @@ class AcademicScoresOverviewView(APIView):
         )
         data = _build_scores_overview(placements)
         return Response(data)
+
+
+# ─── Academic Supervisor Dashboard ────────────────────────────────────────────
+
+class AcademicSupervisorDashboardView(APIView):
+    """
+    GET /api/evaluations/academic/dashboard/   — Academic supervisor: dashboard stats
+    """
+    permission_classes = [IsAcademicSupervisor]
+
+    @extend_schema(
+        responses={200: OpenApiResponse(description='Dashboard data')},
+        description='Get dashboard statistics and recent activity for academic supervisor overview.',
+        tags=['Evaluations — Academic Supervisor'],
+    )
+    def get(self, request):
+        from apps.logs.models import WeeklyLog
+        
+        # Stats
+        total_students = Placement.objects.filter(
+            academic_supervisor=request.user,
+            status='active'
+        ).values('student').distinct().count()
+        
+        pending_reviews = WeeklyLog.objects.filter(
+            placement__academic_supervisor=request.user,
+            status='submitted'
+        ).count()
+        
+        completed_evaluations = AcademicEvaluation.objects.filter(
+            placement__academic_supervisor=request.user
+        ).count()
+        
+        active_placements = Placement.objects.filter(
+            academic_supervisor=request.user,
+            status='active'
+        ).count()
+
+        # Recent activity (last 10 items)
+        recent_activity = []
+
+        # Recent evaluations
+        recent_evals = AcademicEvaluation.objects.filter(
+            placement__academic_supervisor=request.user
+        ).select_related('placement__student').order_by('-created_at')[:5]
+        
+        for eval in recent_evals:
+            recent_activity.append({
+                'description': f'Academic evaluation completed for {eval.placement.student.full_name}',
+                'time': eval.created_at.strftime('%Y-%m-%d %H:%M'),
+            })
+
+        # Recent logs submitted
+        recent_logs = WeeklyLog.objects.filter(
+            placement__academic_supervisor=request.user,
+            status='submitted'
+        ).select_related('student').order_by('-submitted_at')[:5]
+        
+        for log in recent_logs:
+            recent_activity.append({
+                'description': f'Weekly log submitted by {log.student.full_name} (Week {log.week_number})',
+                'time': log.submitted_at.strftime('%Y-%m-%d %H:%M') if log.submitted_at else 'N/A',
+            })
+
+        # Sort by time descending
+        recent_activity.sort(key=lambda x: x['time'], reverse=True)
+        recent_activity = recent_activity[:10]  # Limit to 10
+
+        return Response({
+            'stats': {
+                'total_students': total_students,
+                'pending_reviews': pending_reviews,
+                'completed_evaluations': completed_evaluations,
+                'active_placements': active_placements,
+            },
+            'recent_activity': recent_activity,
+        })
