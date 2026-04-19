@@ -5,6 +5,7 @@ from .views import (
     RejectUserView,
     AllUsersView,
     SystemReportView,
+    DashboardView,
 )
 
 urlpatterns = [
@@ -16,6 +17,9 @@ urlpatterns = [
 
     # Reports
     path('reports/',                  SystemReportView.as_view(), name='admin-system-report'),
+
+    # Dashboard
+    path('dashboard/',                DashboardView.as_view(),    name='admin-dashboard'),
 ]
 
 # Investigating whether the path works
