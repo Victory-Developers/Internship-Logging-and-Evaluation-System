@@ -187,3 +187,60 @@ class SystemReportView(APIView):
                 ),
             },
         })
+
+
+# ─── Dashboard ───────────────────────────────────────────────────────────────
+
+class DashboardView(APIView):
+    """
+    GET /api/admin/dashboard/   — Admin: dashboard statistics and recent activity
+    """
+    permission_classes = [IsAdmin]
+
+    @extend_schema(
+        responses={200: OpenApiResponse(description='Dashboard data')},
+        description='Get dashboard statistics and recent activity for admin overview.',
+        tags=['Admin — Dashboard'],
+    )
+    def get(self, request):
+        # Stats
+        total_students = CustomUser.objects.filter(role='student', status='active').count()
+        total_supervisors = CustomUser.objects.filter(
+            Q(role='academic_supervisor') | Q(role='workplace_supervisor'),
+            status='active'
+        ).count()
+        total_placements = Placement.objects.count()
+        pending_users = CustomUser.objects.filter(status='pending').count()
+
+        # Recent activity (last 10 items)
+        recent_activity = []
+
+        # Recent placements
+        recent_placements = Placement.objects.order_by('-created_at')[:5]
+        for p in recent_placements:
+            recent_activity.append({
+                'description': f'New placement created for {p.student.full_name} at {p.company_name}',
+                'time': p.created_at.strftime('%Y-%m-%d %H:%M'),
+            })
+
+        # Recent logs
+        recent_logs = WeeklyLog.objects.order_by('-submitted_at')[:5]
+        for log in recent_logs:
+            recent_activity.append({
+                'description': f'Weekly log submitted by {log.student.full_name}',
+                'time': log.submitted_at.strftime('%Y-%m-%d %H:%M') if log.submitted_at else 'N/A',
+            })
+
+        # Sort by time descending
+        recent_activity.sort(key=lambda x: x['time'], reverse=True)
+        recent_activity = recent_activity[:10]  # Limit to 10
+
+        return Response({
+            'stats': {
+                'total_students': total_students,
+                'total_supervisors': total_supervisors,
+                'total_placements': total_placements,
+                'pending_users': pending_users,
+            },
+            'recent_activity': recent_activity,
+        })

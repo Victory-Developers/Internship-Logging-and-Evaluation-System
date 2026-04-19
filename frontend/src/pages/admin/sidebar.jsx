@@ -2,9 +2,10 @@ import React from 'react'
 
 const Sidebar = ({ setSelectedFeature }) => {
     const menuItems =[
-        { id: 'stats', label: 'Genarl Stats' },
-        { id: 'students' , label: 'students' },
-    
+        { id: 'dashboard', label: 'Dashboard' },
+        { id: 'users', label: 'Users' },
+        { id: 'placements', label: 'Placements' },
+        { id: 'reports', label: 'Reports' },
     ];
 
     return (
