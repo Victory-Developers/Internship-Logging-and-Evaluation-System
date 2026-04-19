@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from './pages/sidebar';
-import api from '../api/axios';
+import Sidebar from './sidebar';
+import api from '../../api/axios';
 
 const Dashboard = () => {
   const [selectedFeature, setSelectedFeature] = useState('dashboard');

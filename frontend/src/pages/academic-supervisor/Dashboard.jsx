@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { supervisorAPI } from '../services/api'
+import api from "../../api/axios";
 import {
   Navbar, PageLayout, PageBody, Card, Btn, StatusBadge,
   Modal, Spinner, EmptyState, Field, Textarea, Select, toast
-} from '../components/UI'
+} from '../../components/UI'
 
 export default function SupervisorDashboard() {
   const [logs, setLogs] = useState([])

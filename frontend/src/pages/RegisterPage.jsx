@@ -297,10 +297,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="auth-field">
-              <label
-                className="auth-label"
-                htmlFor="confirm_password"
-              >
+              <label className="auth-label" htmlFor="confirm_password">
                 Confirm Password
               </label>
               <input
