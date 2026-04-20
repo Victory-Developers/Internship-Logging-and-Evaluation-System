@@ -26,7 +26,7 @@ class WeeklyLog(models.Model):
                        on_delete=models.CASCADE,
                        related_name='weekly_logs',
                        limit_choices_to={'role': 'student'},
-                   )
+                   ) # Minor change here
 
     week_number  = models.PositiveSmallIntegerField(
                        help_text='Which week of the internship (1, 2, 3 …)'
