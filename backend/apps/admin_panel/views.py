@@ -10,6 +10,13 @@ from apps.users.serializers import UserProfileSerializer
 from apps.placements.models import Placement
 from apps.logs.models import WeeklyLog
 from apps.evaluations.models import WorkplaceEvaluation, AcademicEvaluation
+
+from django.core.mail import send_mail             
+from django.conf import settings                                                                                                                                                     
+import logging                                                                                                                                                                       
+                                                    
+logger = logging.getLogger(__name__)
+
 # moduless....
 
 # ─── User management ──────────────────────────────────────────────────────────
@@ -45,28 +52,44 @@ class ApproveUserView(APIView):
         description='Approve a pending user account. Sets status to "active".',
         tags=['Admin — User Management'],
     )
-    def post(self, request, pk):
-        try:
-            user = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
-            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        if user.status != 'pending':
-            return Response(
+    def post(self, request, pk):                                                                                                                                                     
+        try:                                                     
+            user = CustomUser.objects.get(pk=pk)                                                                                                                                     
+        except CustomUser.DoesNotExist:                                      
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)                                                                                         
+                                                                            
+        if user.status != 'pending':               
+            return Response(                                                                                                                                                         
                 {'detail': f'User status is already "{user.status}".'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+                status=status.HTTP_400_BAD_REQUEST                                                                                                                                   
+            )                                                                
+                                                                
         user.status = 'active'
-        user.save()
-        return Response({
-            'message':  f'{user.full_name} has been approved.',
-            'user_id':  user.id,
-            'email':    user.email,
-            'role':     user.role,
-            'status':   user.status,
-        })
-
+        user.save()                                                                                                                                                                  
+                                        
+        try:                                                                                                                                                                         
+            send_mail(                                                       
+                subject='Your ILES account has been approved',                                                                                                                       
+                message=(   
+                    f'Hello {user.full_name},\n\n'                                                                                                                                   
+                    f'Your ILES (Internship Logging & Evaluation System) account has been approved.\n'
+                    f'You can now log in at: {settings.FRONTEND_LOGIN_URL}\n\n'
+                    f'Email used: {user.email}\n\n'
+                    f'— ILES Team'                                                                                                                                                   
+                ),                                               
+                from_email=settings.DEFAULT_FROM_EMAIL,                                                                                                                              
+                recipient_list=[user.email],                                 
+                fail_silently=False,                                                                                                                                                 
+            )                                      
+        except Exception as e:                                                                                                                                                       
+            logger.warning(f'Approval email failed for {user.email}: {e}')                                                                                                           
+        return Response({                                                                                                                                                            
+            'message':  f'{user.full_name} has been approved.',                                                                                                                      
+            'user_id':  user.id,                                             
+            'email':    user.email,                                                                                                                                                  
+            'role':     user.role,                                           
+            'status':   user.status,                                                                                                                                                 
+        })  
 
 class RejectUserView(APIView):
     """
@@ -82,19 +105,36 @@ class RejectUserView(APIView):
         description='Reject a user account. Sets status to "rejected".',
         tags=['Admin — User Management'],
     )
-    def post(self, request, pk): # commit check...
-        try:
+    def post(self, request, pk):                                                                                                                                                     
+        try:                                                                 
             user = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
+        except CustomUser.DoesNotExist:                                                                                                                                              
             return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        user.status = 'rejected'
-        user.save()
-        return Response({
-            'message': f'{user.full_name} has been rejected.',
-            'user_id': user.id,
-            'status':  user.status,
-        })
+                                                                                                                                                                                    
+        user.status = 'rejected'                                             
+        user.save()                                              
+                                        
+        try:                                       
+            send_mail(                   
+                subject='Update on your ILES account application',                                                                                                                   
+                message=(              
+                    f'Hello {user.full_name},\n\n'                                                                                                                                   
+                    f'Thank you for registering with ILES (Internship Logging & Evaluation System). '
+                    f'Unfortunately, your account application was not approved at this time.\n\n'                                                                                    
+                    f'If you believe this is an error, please contact your administrator.\n\n'
+                    f'— ILES Team'                               
+                ),                                               
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],                                                                                                                                         
+                fail_silently=False,               
+            )                                                                                                                                                                        
+            logger.warning(f'Rejection email failed for {user.email}: {e}')                                                                                                          
+                                                                                                                                                                                    
+        return Response({                                                                                                                                                            
+            'message': f'{user.full_name} has been rejected.',                                                                                                                       
+            'user_id': user.id,                                              
+            'status':  user.status,                                                                                                                                                  
+        })   
 
 
 class AllUsersView(generics.ListAPIView):
