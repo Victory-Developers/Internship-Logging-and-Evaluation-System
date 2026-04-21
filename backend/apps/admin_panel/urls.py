@@ -15,7 +15,7 @@ urlpatterns = [
     path('users/<int:pk>/approve/',   ApproveUserView.as_view(),  name='admin-approve-user'),
     path('users/<int:pk>/reject/',    RejectUserView.as_view(),   name='admin-reject-user'),
 
-    # Reports
+    # Reports...
     path('reports/',                  SystemReportView.as_view(), name='admin-system-report'),
 
     # Dashboard...
