@@ -154,7 +154,7 @@ class SystemReportView(APIView):
         log_stats  = {row['status']: row['count'] for row in log_counts}
         log_stats['total'] = sum(log_stats.values())
 
-        # Pending log reviews (submitted but not yet reviewed)
+        # Pending log reviews (submitted but not yet reviewed)...
         pending_reviews = WeeklyLog.objects.filter(status='submitted').count()
 
         # Evaluations
