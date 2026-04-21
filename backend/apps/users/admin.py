@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
 
 
-@admin.register(CustomUser)
+@admin.register(CustomUser) # check on administrator
 class CustomUserAdmin(UserAdmin):
     list_display   = ['email', 'full_name', 'student_number', 'role', 'status', 'date_joined']
     list_filter    = ['role', 'status']
