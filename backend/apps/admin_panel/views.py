@@ -10,7 +10,7 @@ from apps.users.serializers import UserProfileSerializer
 from apps.placements.models import Placement
 from apps.logs.models import WeeklyLog
 from apps.evaluations.models import WorkplaceEvaluation, AcademicEvaluation
-
+# moduless....
 
 # ─── User management ──────────────────────────────────────────────────────────
 
