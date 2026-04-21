@@ -195,7 +195,7 @@ class DashboardView(APIView):
     """
     GET /api/admin/dashboard/   — Admin: dashboard statistics and recent activity
     """
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdmin] # admin commit check
 
     @extend_schema(
         responses={200: OpenApiResponse(description='Dashboard data')},
