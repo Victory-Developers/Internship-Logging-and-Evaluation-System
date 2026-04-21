@@ -12,7 +12,7 @@ class WeeklyLog(models.Model):
         ('draft',     'Draft'),
         ('submitted', 'Submitted'),
         ('reviewed',  'Reviewed'),      # workplace superviso has commented
-        ('approved',  'Approved'),      # workplace supervisor 
+        ('approved',  'Approved'),      # workplace supervisor...
         ('rejected',  'Rejected'),     # sent back for revision...
     ]
 
