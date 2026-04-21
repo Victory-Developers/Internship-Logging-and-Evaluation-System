@@ -231,7 +231,7 @@ class DashboardView(APIView):
                 'time': log.submitted_at.strftime('%Y-%m-%d %H:%M') if log.submitted_at else 'N/A',
             })
 
-        # Sort by time descending
+        # Sort by time descending...
         recent_activity.sort(key=lambda x: x['time'], reverse=True)
         recent_activity = recent_activity[:10]  # Limit to 10
 
