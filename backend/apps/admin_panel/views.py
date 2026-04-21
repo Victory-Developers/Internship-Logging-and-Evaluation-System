@@ -12,7 +12,10 @@ from apps.logs.models import WeeklyLog
 from apps.evaluations.models import WorkplaceEvaluation, AcademicEvaluation
 
 from django.core.mail import send_mail             
-from django.conf import settings                                                                                                                                                     
+from django.conf import settings   
+
+from django_filters.rest_framework import DjangoFilterBackend                                                                                                                        
+from rest_framework.filters import SearchFilter, OrderingFilter                                                                                                                                                 
 import logging                                                                                                                                                                       
                                                     
 logger = logging.getLogger(__name__)
@@ -127,9 +130,10 @@ class RejectUserView(APIView):
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],                                                                                                                                         
                 fail_silently=False,               
-            )                                                                                                                                                                        
+            )
+        except Exception as e:                                                                                                                                                                        
             logger.warning(f'Rejection email failed for {user.email}: {e}')                                                                                                          
-                                                                                                                                                                                    
+                                                                                                                                                                                  
         return Response({                                                                                                                                                            
             'message': f'{user.full_name} has been rejected.',                                                                                                                       
             'user_id': user.id,                                              
@@ -139,24 +143,28 @@ class RejectUserView(APIView):
 
 class AllUsersView(generics.ListAPIView):
     """
-    GET /api/admin/users/   — Admin: list all users with optional role filter
+    GET /api/admin/users/   — Admin: list all users with pagination, search, and filters
     """
     permission_classes = [IsAdmin]
     serializer_class   = UserProfileSerializer
+    queryset           = CustomUser.objects.all()
 
-    @extend_schema(
-        description='List all users. Filter by ?role=student|workplace_supervisor|academic_supervisor|admin and/or ?status=pending|active|rejected.',
-        tags=['Admin — User Management'],
-    )
-    def get_queryset(self):
-        qs            = CustomUser.objects.all().order_by('role', 'full_name')
-        role_filter   = self.request.query_params.get('role')
-        status_filter = self.request.query_params.get('status')
-        if role_filter:
-            qs = qs.filter(role=role_filter)
-        if status_filter:
-            qs = qs.filter(status=status_filter)
-        return qs
+    filter_backends    = [DjangoFilterBackend, SearchFilter, OrderingFilter]                                                                                                         
+    filterset_fields   = ['role', 'status']
+    search_fields      = ['email', 'full_name', 'student_number']                                                                                                                    
+    ordering_fields    = ['date_joined', 'full_name', 'role']                
+    ordering           = ['-date_joined']
+
+    @extend_schema(                                                                                                                                                                  
+        description=(                                                                                                                                                                
+            'List all users with pagination. '
+            'Filter by ?role=&status=. '                                                                                                                                             
+            'Order with ?ordering=date_joined or -date_joined.'                                                                                                                      
+        ),                                                     
+        tags=['Admin — User Management'],                                                                                                                                            
+    )                                                                        
+    def get(self, request, *args, **kwargs):                                                                                                                                         
+        return super().get(request, *args, **kwargs) 
 
 
 # ─── System reports ───────────────────────────────────────────────────────────
