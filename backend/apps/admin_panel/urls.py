@@ -18,7 +18,7 @@ urlpatterns = [
     # Reports
     path('reports/',                  SystemReportView.as_view(), name='admin-system-report'),
 
-    # Dashboard
+    # Dashboard...
     path('dashboard/',                DashboardView.as_view(),    name='admin-dashboard'),
 ]
 
