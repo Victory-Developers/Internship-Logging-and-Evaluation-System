@@ -109,7 +109,7 @@ class LoginSerializer(serializers.Serializer):
                 'Your account has been rejected. Contact the administrator.'
             )
 
-        data['user'] = user
+        data['user'] = user # user attempts to commit data
         return data
 
 
