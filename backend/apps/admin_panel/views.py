@@ -82,7 +82,7 @@ class RejectUserView(APIView):
         description='Reject a user account. Sets status to "rejected".',
         tags=['Admin — User Management'],
     )
-    def post(self, request, pk):
+    def post(self, request, pk): # commit check...
         try:
             user = CustomUser.objects.get(pk=pk)
         except CustomUser.DoesNotExist:
