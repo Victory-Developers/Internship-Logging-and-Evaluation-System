@@ -244,3 +244,5 @@ class DashboardView(APIView):
             },
             'recent_activity': recent_activity,
         })
+    
+    #...
