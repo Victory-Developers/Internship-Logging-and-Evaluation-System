@@ -38,6 +38,20 @@ class PendingUsersView(generics.ListAPIView):
     def get_queryset(self):
         return CustomUser.objects.filter(status='pending').order_by('date_joined')
 
+class PendingUsersCountView(APIView):                                                                                                                                                
+    """                                                                      
+    GET /api/admin/users/pending/count/   — Admin: count of pending-approval users                                                                                                   
+    """                                                                      
+    permission_classes = [IsAdmin]                                                                                                                                                   
+                            
+    @extend_schema(                                                                                                                                                                  
+        responses={200: OpenApiResponse(description='{"count": <int>}')},    
+        description='Returns just the count of users awaiting approval. Used for the admin notification badge.',                                                                     
+        tags=['Admin — User Management'],                                    
+    )                                                            
+    def get(self, request):                                                                                                                                                          
+        count = CustomUser.objects.filter(status='pending').count()
+        return Response({'count': count})  
 
 class ApproveUserView(APIView):
     """
