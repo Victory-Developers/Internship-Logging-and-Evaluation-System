@@ -7,6 +7,7 @@ from .views import (
     StudentScoresView,
     AdminScoresOverviewView,
     AcademicScoresOverviewView,
+    AcademicSupervisorDashboardView,
 )
 
 urlpatterns = [
@@ -21,6 +22,7 @@ urlpatterns = [
     path('academic/',             AcademicEvaluationListCreateView.as_view(),   name='academic-eval-list-create'),
     path('academic/<int:pk>/',    AcademicEvaluationDetailView.as_view(),       name='academic-eval-detail'),
     path('academic/scores/',      AcademicScoresOverviewView.as_view(),         name='academic-scores-overview'),
+    path('academic/dashboard/',   AcademicSupervisorDashboardView.as_view(),    name='academic-supervisor-dashboard'),
 
     # Admin
     path('admin/scores/',         AdminScoresOverviewView.as_view(),            name='admin-scores-overview'),
