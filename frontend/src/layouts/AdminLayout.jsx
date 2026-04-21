@@ -27,7 +27,7 @@ return (
             <span className="nav-link-icon"></span> Dashboard
         </NavLink>
         <NavLink to="/admin/users" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span className="nav-link-icon"></span> Students
+            <span className="nav-link-icon"></span> Users
         </NavLink>
         <NavLink to="/admin/placements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <span className="nav-link-icon"></span> Placements
@@ -39,7 +39,7 @@ return (
 
         <div className="sidebar-footer">
         <NavLink to="/admin/placements/new" className="sidebar-cta-btn">
-            + Generate Report
+            + New Placement
         </NavLink>
         <button onClick={handleLogout} className="sidebar-footer-link">
             Logout
