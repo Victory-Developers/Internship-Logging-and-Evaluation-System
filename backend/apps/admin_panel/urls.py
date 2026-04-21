@@ -9,7 +9,7 @@ from .views import (
 )
 
 urlpatterns = [
-    # User management
+    # User management...
     path('users/',                    AllUsersView.as_view(),     name='admin-all-users'),
     path('users/pending/',            PendingUsersView.as_view(), name='admin-pending-users'),
     path('users/<int:pk>/approve/',   ApproveUserView.as_view(),  name='admin-approve-user'),
