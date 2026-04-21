@@ -22,4 +22,4 @@ urlpatterns = [
     path('api/auth/', include('apps.users.urls')),
 ]
 
-# Check whether routes are functional
+# Check whether routes are functional & paths are needed here
