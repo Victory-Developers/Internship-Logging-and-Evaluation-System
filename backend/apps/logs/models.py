@@ -11,9 +11,9 @@ class WeeklyLog(models.Model):
     STATUS_CHOICES = [
         ('draft',     'Draft'),
         ('submitted', 'Submitted'),
-        ('reviewed',  'Reviewed'),      # workplace superviso has commented
-        ('approved',  'Approved'),      # workplace supervisor 
-        ('rejected',  'Rejected'),     # sent back for revision
+        ('reviewed',  'Reviewed'),      # workplace superviso has commented...
+        ('approved',  'Approved'),      # workplace supervisor...
+        ('rejected',  'Rejected'),     # sent back for revision...
     ]
 
     placement    = models.ForeignKey(
@@ -99,3 +99,6 @@ class LogComment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.author.full_name} on {self.log}'
+
+#...
+#...

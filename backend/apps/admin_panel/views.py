@@ -10,7 +10,7 @@ from apps.users.serializers import UserProfileSerializer
 from apps.placements.models import Placement
 from apps.logs.models import WeeklyLog
 from apps.evaluations.models import WorkplaceEvaluation, AcademicEvaluation
-
+# moduless....
 
 # ─── User management ──────────────────────────────────────────────────────────
 
@@ -34,7 +34,7 @@ class ApproveUserView(APIView):
     POST /api/admin/users/<id>/approve/   — Admin: approve a pending user
     """
     permission_classes = [IsAdmin]
-    # Checked whether permissions are working or not
+    # Checked whether permissions are working or not...
 
     @extend_schema(
         responses={
@@ -82,7 +82,7 @@ class RejectUserView(APIView):
         description='Reject a user account. Sets status to "rejected".',
         tags=['Admin — User Management'],
     )
-    def post(self, request, pk):
+    def post(self, request, pk): # commit check...
         try:
             user = CustomUser.objects.get(pk=pk)
         except CustomUser.DoesNotExist:
@@ -154,7 +154,7 @@ class SystemReportView(APIView):
         log_stats  = {row['status']: row['count'] for row in log_counts}
         log_stats['total'] = sum(log_stats.values())
 
-        # Pending log reviews (submitted but not yet reviewed)
+        # Pending log reviews (submitted but not yet reviewed)...
         pending_reviews = WeeklyLog.objects.filter(status='submitted').count()
 
         # Evaluations
@@ -195,7 +195,7 @@ class DashboardView(APIView):
     """
     GET /api/admin/dashboard/   — Admin: dashboard statistics and recent activity
     """
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdmin] # admin commit check
 
     @extend_schema(
         responses={200: OpenApiResponse(description='Dashboard data')},
@@ -231,7 +231,7 @@ class DashboardView(APIView):
                 'time': log.submitted_at.strftime('%Y-%m-%d %H:%M') if log.submitted_at else 'N/A',
             })
 
-        # Sort by time descending
+        # Sort by time descending...
         recent_activity.sort(key=lambda x: x['time'], reverse=True)
         recent_activity = recent_activity[:10]  # Limit to 10
 
@@ -244,3 +244,5 @@ class DashboardView(APIView):
             },
             'recent_activity': recent_activity,
         })
+    
+    #...

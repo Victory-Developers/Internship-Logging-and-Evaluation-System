@@ -109,7 +109,7 @@ class LoginSerializer(serializers.Serializer):
                 'Your account has been rejected. Contact the administrator.'
             )
 
-        data['user'] = user
+        data['user'] = user # user attempts to commit data
         return data
 
 
@@ -157,6 +157,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
             )
         return value
 
+# further commits needed
 
 class ResetPasswordSerializer(serializers.Serializer):
     token            = serializers.UUIDField()
