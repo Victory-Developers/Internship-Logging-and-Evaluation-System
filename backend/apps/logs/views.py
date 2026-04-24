@@ -308,7 +308,7 @@ class LogCommentCreateView(APIView):
         except WeeklyLog.DoesNotExist:
             return Response({'detail': 'Log not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Must be an assigned supervisor or admin
+        # Must be an assigned supervisor or admin.
         placement = log.placement
         user      = request.user
         allowed   = (
