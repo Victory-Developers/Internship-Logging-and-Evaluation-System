@@ -56,7 +56,7 @@ class IsAdmin(BasePermission): # Admin base~
         )
 
 
-class IsAdminOrReadOnly(BasePermission):
+class IsAdminOrReadOnly(BasePermission): # Ready or not
     """Admin can write; authenticated active users can read."""
 
     def has_permission(self, request, view):
