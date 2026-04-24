@@ -45,7 +45,7 @@ class IsAcademicSupervisor(BasePermission): # Academic sup base~
         )
 
 
-class IsAdmin(BasePermission):
+class IsAdmin(BasePermission): # Admin base~
     message = 'Only administrators can perform this action.'
 
     def has_permission(self, request, view):
