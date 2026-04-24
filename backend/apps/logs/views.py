@@ -274,7 +274,7 @@ class WorkplaceLogReviewView(APIView):
         comment = serializer.validated_data.get('comment', '').strip()
 
         log.status = 'approved' if action == 'approve' else 'rejected'
-        log.save()
+        log.save() # Save the log file
 
         if comment:
             LogComment.objects.create(log=log, author=request.user, comment=comment)
