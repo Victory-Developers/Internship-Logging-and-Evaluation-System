@@ -1,0 +1,1 @@
+web: gunicorn --chdir backend iles_project.wsgi --log-file -
