@@ -12,7 +12,7 @@ class IsActiveUser(BasePermission): # Is User active?
         )
 
 
-class IsStudent(BasePermission):
+class IsStudent(BasePermission): # Student base~
     message = 'Only students can perform this action.'
 
     def has_permission(self, request, view):
