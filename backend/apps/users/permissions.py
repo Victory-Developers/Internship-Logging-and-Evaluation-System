@@ -28,7 +28,7 @@ class IsAcademicSupervisor(BasePermission): # Academic supervisor
         )
 
 
-class IsAdmin(BasePermission):
+class IsAdmin(BasePermission): # Administrator supervisor
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated and
