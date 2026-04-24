@@ -23,7 +23,7 @@ class IsStudent(BasePermission): # Student base~
         )
 
 
-class IsWorkplaceSupervisor(BasePermission):
+class IsWorkplaceSupervisor(BasePermission): # Workplace base~
     message = 'Only workplace supervisors can perform this action.'
 
     def has_permission(self, request, view):
