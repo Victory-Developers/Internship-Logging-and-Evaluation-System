@@ -205,7 +205,7 @@ class WorkplaceLogListView(generics.ListAPIView):
         tags=['Weekly Logs — Workplace Supervisor'],
     )
     def get_queryset(self):
-        # Get all placements where this user is the workplace supervisor
+        # Get all placements where this user is the workplace supervisor.
         placement_ids = Placement.objects.filter(
             workplace_supervisor=self.request.user
         ).values_list('id', flat=True)
@@ -274,7 +274,7 @@ class WorkplaceLogReviewView(APIView):
         comment = serializer.validated_data.get('comment', '').strip()
 
         log.status = 'approved' if action == 'approve' else 'rejected'
-        log.save()
+        log.save() # Save the log file
 
         if comment:
             LogComment.objects.create(log=log, author=request.user, comment=comment)
@@ -308,7 +308,7 @@ class LogCommentCreateView(APIView):
         except WeeklyLog.DoesNotExist:
             return Response({'detail': 'Log not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Must be an assigned supervisor or admin
+        # Must be an assigned supervisor or admin.
         placement = log.placement
         user      = request.user
         allowed   = (
@@ -325,7 +325,7 @@ class LogCommentCreateView(APIView):
         serializer = LogCommentCreateSerializer(data=request.data)
         if serializer.is_valid():
             comment = serializer.save(log=log, author=request.user)
-            # Mark log as reviewed if it was approved/submitted
+            # Mark log as reviewed if it was approved/submitted.
             if log.status in ('submitted', 'approved'):
                 log.status = 'reviewed'
                 log.save()
@@ -402,3 +402,5 @@ class AdminLogListView(generics.ListAPIView):
             qs = qs.filter(placement_id=placement_filter)
 
         return qs.order_by('-week_start')
+# ...
+# ...

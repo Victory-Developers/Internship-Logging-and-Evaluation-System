@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsStudent(BasePermission):
+class IsStudent(BasePermission): # Student permission
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated and
@@ -10,7 +10,7 @@ class IsStudent(BasePermission):
         )
 
 
-class IsWorkplaceSupervisor(BasePermission):
+class IsWorkplaceSupervisor(BasePermission): # Workplace supervisor
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated and
@@ -19,7 +19,7 @@ class IsWorkplaceSupervisor(BasePermission):
         )
 
 
-class IsAcademicSupervisor(BasePermission):
+class IsAcademicSupervisor(BasePermission): # Academic supervisor
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated and
@@ -28,10 +28,12 @@ class IsAcademicSupervisor(BasePermission):
         )
 
 
-class IsAdmin(BasePermission):
+class IsAdmin(BasePermission): # Administrator supervisor
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated and
             request.user.role == 'admin' and
             request.user.status == 'active'
         )
+# ...
+# ...

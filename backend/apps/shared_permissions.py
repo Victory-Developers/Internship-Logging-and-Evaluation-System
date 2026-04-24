@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsActiveUser(BasePermission):
+class IsActiveUser(BasePermission): # Is User active?
     """Reject pending/rejected accounts."""
     message = 'Your account is not yet approved.'
 
@@ -12,7 +12,7 @@ class IsActiveUser(BasePermission):
         )
 
 
-class IsStudent(BasePermission):
+class IsStudent(BasePermission): # Student base~
     message = 'Only students can perform this action.'
 
     def has_permission(self, request, view):
@@ -23,7 +23,7 @@ class IsStudent(BasePermission):
         )
 
 
-class IsWorkplaceSupervisor(BasePermission):
+class IsWorkplaceSupervisor(BasePermission): # Workplace base~
     message = 'Only workplace supervisors can perform this action.'
 
     def has_permission(self, request, view):
@@ -34,7 +34,7 @@ class IsWorkplaceSupervisor(BasePermission):
         )
 
 
-class IsAcademicSupervisor(BasePermission):
+class IsAcademicSupervisor(BasePermission): # Academic sup base~
     message = 'Only academic supervisors can perform this action.'
 
     def has_permission(self, request, view):
@@ -45,7 +45,7 @@ class IsAcademicSupervisor(BasePermission):
         )
 
 
-class IsAdmin(BasePermission):
+class IsAdmin(BasePermission): # Admin base~
     message = 'Only administrators can perform this action.'
 
     def has_permission(self, request, view):
@@ -56,7 +56,7 @@ class IsAdmin(BasePermission):
         )
 
 
-class IsAdminOrReadOnly(BasePermission):
+class IsAdminOrReadOnly(BasePermission): # Ready or not
     """Admin can write; authenticated active users can read."""
 
     def has_permission(self, request, view):
