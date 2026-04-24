@@ -205,7 +205,7 @@ class WorkplaceLogListView(generics.ListAPIView):
         tags=['Weekly Logs — Workplace Supervisor'],
     )
     def get_queryset(self):
-        # Get all placements where this user is the workplace supervisor
+        # Get all placements where this user is the workplace supervisor.
         placement_ids = Placement.objects.filter(
             workplace_supervisor=self.request.user
         ).values_list('id', flat=True)
