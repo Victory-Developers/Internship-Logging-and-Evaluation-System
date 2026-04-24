@@ -35,3 +35,4 @@ class IsAdmin(BasePermission): # Administrator supervisor
             request.user.role == 'admin' and
             request.user.status == 'active'
         )
+# ...
