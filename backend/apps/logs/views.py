@@ -325,7 +325,7 @@ class LogCommentCreateView(APIView):
         serializer = LogCommentCreateSerializer(data=request.data)
         if serializer.is_valid():
             comment = serializer.save(log=log, author=request.user)
-            # Mark log as reviewed if it was approved/submitted
+            # Mark log as reviewed if it was approved/submitted.
             if log.status in ('submitted', 'approved'):
                 log.status = 'reviewed'
                 log.save()
