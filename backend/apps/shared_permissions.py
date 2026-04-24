@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsActiveUser(BasePermission):
+class IsActiveUser(BasePermission): # Is User active?
     """Reject pending/rejected accounts."""
     message = 'Your account is not yet approved.'
 
