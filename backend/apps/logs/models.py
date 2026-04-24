@@ -100,4 +100,3 @@ class LogComment(models.Model):
     def __str__(self):
         return f'Comment by {self.author.full_name} on {self.log}'
 
-#...
