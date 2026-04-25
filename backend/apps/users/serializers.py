@@ -73,13 +73,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return data
 
-    def create(self, validated_data):                            
-        validated_data.pop('confirm_password')                                                                                                                                       
-        user = CustomUser(**validated_data)                                                                                                                                          
-        user.set_password(password)                                                                                                                                                  
-        user.status = 'pending'                                                                                                                                                      
-        user.save()                                                          
-        return user  
+    def create(self, validated_data):
+        validated_data.pop('confirm_password')
+        password = validated_data.pop('password')
+        user = CustomUser(**validated_data)
+        user.set_password(password)
+        user.status = 'pending'
+        user.save()
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
