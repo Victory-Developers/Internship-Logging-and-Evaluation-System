@@ -5,14 +5,53 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter 
+from rest_framework.filters import SearchFilter, OrderingFilter
 
-from .models import Placement
-from .serializers import PlacementSerializer, PlacementCreateSerializer
+from .models import Company, Placement
+from .serializers import (
+    CompanySerializer,
+    CompanySearchSerializer,
+    PlacementSerializer,
+    PlacementCreateSerializer,
+    StudentPlacementSubmitSerializer,
+)
 from apps.shared_permissions import IsAdmin, IsStudent, IsActiveUser
 
+class CompanyListCreateView(generics.ListCreateAPIView):
+    """
+    GET  /api/companies/          — List all companies
+    POST /api/companies/          — Create a company
+    """
+    permission_classes = [IsActiveUser]
+    serializer_class   = CompanySerializer
+    queryset           = Company.objects.all()
+    filter_backends    = [SearchFilter, OrderingFilter]
+    search_fields      = ['name', 'address']
+    ordering_fields    = ['name', 'created_at']
+    ordering           = ['name']
 
-# ─── Admin: full CRU ─────────────────────────────────────────────────────────
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
+class CompanySearchView(generics.ListAPIView):
+    """
+    GET /api/companies/search/?q=...  — Autocomplete search, returns top 10.
+    """
+    permission_classes  = [IsActiveUser]
+    serializer_class    = CompanySearchSerializer
+    pagination_class    = None
+
+    @extend_schema(
+        parameters=[OpenApiParameter('q', OpenApiTypes.STR, description='Search query')],
+        tags=['Companies'],
+    )
+    def get_queryset(self):
+        q = self.request.query_params.get('q', '').strip()
+        if not q:
+            return Company.objects.none()
+        return Company.objects.filter(name__icontains=q)[:10]
+
 
 class PlacementListCreateView(generics.ListCreateAPIView):
     """
@@ -27,7 +66,7 @@ class PlacementListCreateView(generics.ListCreateAPIView):
         return PlacementSerializer
 
     queryset = Placement.objects.select_related(
-        'student', 'workplace_supervisor', 'academic_supervisor', 'created_by'                                                                                                       
+        'student', 'workplace_supervisor', 'academic_supervisor', 'created_by', 'company'                                                                                                     
     )                                  
     filter_backends    = [DjangoFilterBackend, SearchFilter, OrderingFilter]                                                                                                         
     filterset_fields   = ['status']                                          
@@ -36,7 +75,7 @@ class PlacementListCreateView(generics.ListCreateAPIView):
     ordering           = ['-created_at']   
 
     @extend_schema(
-        description='List all internship placements. Filter by ?status=active|completed|cancelled.',
+        description='List all internship placements. Filter by ?status=active|pending|completed|cancelled.',
         tags=['Placements — Admin'],
         parameters=[
             OpenApiParameter('status', OpenApiTypes.STR, description='Filter by placement status'),
@@ -76,7 +115,7 @@ class PlacementDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     permission_classes = [IsAdmin]
     queryset = Placement.objects.select_related(
-        'student', 'workplace_supervisor', 'academic_supervisor', 'created_by'
+        'student', 'workplace_supervisor', 'academic_supervisor', 'created_by', 'company'
     )
 
     def get_serializer_class(self):
@@ -120,7 +159,7 @@ class MyPlacementView(APIView):
     def get(self, request):
         try:
             placement = Placement.objects.select_related(
-                'student', 'workplace_supervisor', 'academic_supervisor'
+                'student', 'workplace_supervisor', 'academic_supervisor', 'company'
             ).get(student=request.user)
         except Placement.DoesNotExist:
             return Response(
@@ -129,6 +168,28 @@ class MyPlacementView(APIView):
             )
         return Response(PlacementSerializer(placement).data)
 
+class StudentPlacementSubmitView(APIView):
+    """
+    POST /api/placements/submit/  — Student submits a placement request.
+    """
+    permission_classes = [IsStudent]
+
+    @extend_schema(
+        request=StudentPlacementSubmitSerializer,
+        responses={201: PlacementSerializer},
+        tags=['Placements — Student'],
+    )
+    def post(self, request):
+        serializer = StudentPlacementSubmitSerializer(
+            data=request.data, context={'request': request}
+        )
+        if serializer.is_valid():
+            placement = serializer.save()
+            return Response(
+                PlacementSerializer(placement).data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # ─── Workplace supervisor: view assigned students ─────────────────────────────
 
@@ -145,7 +206,7 @@ class WorkplacePlacementsView(generics.ListAPIView):
     )
     def get_queryset(self):
         return Placement.objects.select_related(
-            'student', 'workplace_supervisor', 'academic_supervisor'
+            'student', 'workplace_supervisor', 'academic_supervisor', 'company'
         ).filter(workplace_supervisor=self.request.user)
 
 
@@ -164,5 +225,5 @@ class AcademicPlacementsView(generics.ListAPIView):
     )
     def get_queryset(self):
         return Placement.objects.select_related(
-            'student', 'workplace_supervisor', 'academic_supervisor'
+            'student', 'workplace_supervisor', 'academic_supervisor', 'company'
         ).filter(academic_supervisor=self.request.user)
