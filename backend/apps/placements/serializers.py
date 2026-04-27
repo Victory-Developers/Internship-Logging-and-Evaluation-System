@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Placement
+from .models import Company, Placement
 from apps.users.models import CustomUser
 
 
@@ -10,6 +10,19 @@ class UserBriefSerializer(serializers.ModelSerializer):
         model  = CustomUser
         fields = ['id', 'full_name', 'email', 'role', 'student_number', 'organisation']
 
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = Company
+        fields = ['id', 'name', 'address', 'email', 'phone', 'website', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class CompanySearchSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for autocomplete."""
+
+    class Meta:
+        model  = Company
+        fields = ['id', 'name', 'address']
 
 class PlacementSerializer(serializers.ModelSerializer):
     """Read serializer — returns nested user info."""
@@ -18,15 +31,17 @@ class PlacementSerializer(serializers.ModelSerializer):
     workplace_supervisor = UserBriefSerializer(read_only=True)
     academic_supervisor  = UserBriefSerializer(read_only=True)
     created_by           = UserBriefSerializer(read_only=True)
+    company_detail = CompanySerializer(source='company', read_only=True)
     duration_days        = serializers.SerializerMethodField()
 
     class Meta:
         model  = Placement
         fields = [
             'id', 'student', 'workplace_supervisor', 'academic_supervisor',
+            'company', 'company_detail'
             'company_name', 'company_address', 'job_title', 'description',
             'start_date', 'end_date', 'weekly_log_deadline',
-            'status', 'duration_days', 'created_by', 'created_at', 'updated_at',
+            'status', 'invited_supervisor_email', 'duration_days', 'created_by', 'created_at', 'updated_at',
         ]
 
     def get_duration_days(self, obj):
@@ -42,7 +57,7 @@ class PlacementCreateSerializer(serializers.ModelSerializer):
         model  = Placement
         fields = [
             'student', 'workplace_supervisor', 'academic_supervisor',
-            'company_name', 'company_address', 'job_title', 'description',
+            'company', 'company_name', 'company_address', 'job_title', 'description',
             'start_date', 'end_date', 'weekly_log_deadline', 'status',
         ]
 
@@ -72,7 +87,7 @@ class PlacementCreateSerializer(serializers.ModelSerializer):
     def validate_student(self, value):
         # Prevent a student from having two active placements
         instance = self.instance
-        qs = Placement.objects.filter(student=value, status='active')
+        qs = Placement.objects.filter(student=value).exclude(status='cancelled')
         if instance:
             qs = qs.exclude(pk=instance.pk)
         if qs.exists():
