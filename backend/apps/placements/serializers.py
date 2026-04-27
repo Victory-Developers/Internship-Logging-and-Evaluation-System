@@ -95,3 +95,77 @@ class PlacementCreateSerializer(serializers.ModelSerializer):
                 'This student already has an active placement.'
             )
         return value
+
+class StudentPlacementSubmitSerializer(serializers.Serializer):
+    """Student submits a placement request (company + job details)."""
+
+    # Company — either pick existing or provide new details
+    company            = serializers.PrimaryKeyRelatedField(
+                             queryset=Company.objects.all(), required=False, allow_null=True
+                         )
+    new_company_name   = serializers.CharField(max_length=255, required=False)
+    new_company_address = serializers.CharField(required=False, allow_blank=True)
+    new_company_email  = serializers.EmailField(required=False, allow_blank=True)
+    new_company_phone  = serializers.CharField(max_length=30, required=False, allow_blank=True)
+
+    # Placement fields
+    job_title          = serializers.CharField(max_length=255)
+    description        = serializers.CharField(required=False, allow_blank=True)
+    start_date         = serializers.DateField()
+    end_date           = serializers.DateField()
+
+    # Optional supervisor link
+    workplace_supervisor = serializers.PrimaryKeyRelatedField(
+                               queryset=CustomUser.objects.filter(role='workplace_supervisor'),
+                               required=False, allow_null=True
+                           )
+    invited_supervisor_email = serializers.EmailField(required=False, allow_blank=True)
+
+    def validate(self, data):
+        if not data.get('company') and not data.get('new_company_name'):
+            raise serializers.ValidationError(
+                'Either select an existing company or provide a new company name.'
+            )
+        if data.get('start_date') and data.get('end_date'):
+            if data['end_date'] <= data['start_date']:
+                raise serializers.ValidationError({'end_date': 'End date must be after start date.'})
+        return data
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+
+        # Check student doesn't already have a non-cancelled placement
+        if Placement.objects.filter(student=user).exclude(status='cancelled').exists():
+            raise serializers.ValidationError(
+                {'detail': 'You already have a placement.'}
+            )
+
+        # Resolve or create company
+        company = validated_data.get('company')
+        if not company and validated_data.get('new_company_name'):
+            company = Company.objects.create(
+                name=validated_data['new_company_name'],
+                address=validated_data.get('new_company_address', ''),
+                email=validated_data.get('new_company_email', ''),
+                phone=validated_data.get('new_company_phone', ''),
+                created_by=user,
+            )
+
+        placement = Placement.objects.create(
+            student=user,
+            company=company,
+            company_name=company.name if company else validated_data.get('new_company_name', ''),
+            company_address=company.address if company else validated_data.get('new_company_address', ''),
+            job_title=validated_data['job_title'],
+            description=validated_data.get('description', ''),
+            start_date=validated_data['start_date'],
+            end_date=validated_data['end_date'],
+            status='pending',
+            workplace_supervisor=validated_data.get('workplace_supervisor'),
+            invited_supervisor_email=validated_data.get('invited_supervisor_email', ''),
+            created_by=user,
+        )
+        return placement
+
+    
+    
