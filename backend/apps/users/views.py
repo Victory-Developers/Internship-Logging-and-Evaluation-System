@@ -14,6 +14,7 @@ from .serializers import (
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
 )
+from apps.shared_permission import IsStudent
 
 
 class RegisterView(APIView):
@@ -254,3 +255,52 @@ class ResetPasswordView(APIView):
                 status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class InviteSupervisorView(APIView):
+    """
+    POST /api/auth/invite/  — Student invites a workplace supervisor by email.
+    If the user already exists and is a workplace_supervisor, returns their info.
+    Otherwise returns a registration link.
+    """
+    permission_classes = [IsStudent]
+
+    @extend_schema(
+        description='Invite a workplace supervisor by email.',
+        tags=['Authentication'],
+    )
+    def post(self, request):
+        email = request.data.get('email', '').strip().lower()
+        if not email:
+            return Response(
+                {'email': 'Email is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            existing = CustomUser.objects.get(email=email)
+            if existing.role == 'workplace_supervisor' and existing.status == 'active':
+                return Response({
+                    'status': 'existing',
+                    'user': {
+                        'id': existing.id,
+                        'full_name': existing.full_name,
+                        'email': existing.email,
+                    },
+                    'message': f'{existing.full_name} is already registered as a workplace supervisor.',
+                })
+            elif existing.role == 'workplace_supervisor':
+                return Response({
+                    'status': 'pending',
+                    'message': f'{existing.full_name} has registered but is awaiting admin approval.',
+                })
+            else:
+                return Response({
+                    'status': 'wrong_role',
+                    'message': 'A user with this email exists but is not a workplace supervisor.',
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except CustomUser.DoesNotExist:
+            return Response({
+                'status': 'invited',
+                'message': f'Invitation sent. They can register at /register?email={email}&role=workplace_supervisor',
+                'registration_link': f'/register?email={email}&role=workplace_supervisor',
+            })
