@@ -20,7 +20,7 @@ const getDashboardPath = () => {
     case ROLES.STUDENT: return '/student/dashboard';         
     case ROLES.ADMIN: return '/admin/dashboard';                            
     case ROLES.ACADEMIC_SUPERVISOR: return '/supervisor/dashboard';
-    case ROLES.WORKPLACE_SUPERVISOR: return '/supervisor/dashboard';        
+    case ROLES.WORKPLACE_SUPERVISOR: return '/workplace/dashboard';        
     default: return '/login';                                               
     }
 };                                                                          
