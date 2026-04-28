@@ -33,6 +33,9 @@ return (
         <NavLink to="/admin/placements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <span className="nav-link-icon"></span> Placements
         </NavLink>
+        <NavLink to="/admin/logs" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span className="nav-link-icon"></span> Logs
+        </NavLink>
         <NavLink to="/admin/reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <span className="nav-link-icon"></span> Reports
         </NavLink>
@@ -57,12 +60,12 @@ return (
             <div className="topbar-user">                                                                                                                                            
                 <div>                                  
                     <div className="topbar-user-name">{user?.full_name}</div>                                                                                                            
-                    <div className="topbar-user-role">Administrator</div>        
+                    <div className="topbar-user-role">Administrator</div>  
+                </div>      
                 <div className="topbar-avatar">
-                {user?.full_name?.charAt(0) || 'A'}                                                                                                                                  
+                    {user?.full_name?.charAt(0) || 'A'}                                                                                                                                  
                 </div>                                   
             </div> 
-        </div>                                                                                                                                                                  
         </div>
         </header>
         <div className="page-content">
