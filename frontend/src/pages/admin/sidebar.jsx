@@ -5,6 +5,7 @@ const Sidebar = ({ setSelectedFeature }) => {
         { id: 'dashboard', label: 'Dashboard' },
         { id: 'users', label: 'Users' },
         { id: 'placements', label: 'Placements' },
+        { id: 'internships', label: 'Internships'},
         { id: 'reports', label: 'Reports' },
     ];
 
