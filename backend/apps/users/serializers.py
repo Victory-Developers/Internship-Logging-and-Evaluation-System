@@ -1,10 +1,28 @@
+import re
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import CustomUser
 
 
+def validate_password_strength(password):
+    """Shared password‑strength check used by all auth serializers."""
+    errors = []
+    if len(password) < 8:
+        errors.append('Must be at least 8 characters.')
+    if not re.search(r'[A-Z]', password):
+        errors.append('Must contain at least one uppercase letter.')
+    if not re.search(r'[a-z]', password):
+        errors.append('Must contain at least one lowercase letter.')
+    if not re.search(r'[0-9]', password):
+        errors.append('Must contain at least one number.')
+    if not re.search(r'[^a-zA-Z0-9]', password):
+        errors.append('Must contain at least one special character.')
+    if errors:
+        raise serializers.ValidationError(errors)
+    return password
+
 class RegisterSerializer(serializers.ModelSerializer):
-    password         = serializers.CharField(write_only=True, min_length=6)
+    password         = serializers.CharField(write_only=True, min_length=8)
     confirm_password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -45,6 +63,9 @@ class RegisterSerializer(serializers.ModelSerializer):
                 'This student number is already registered.'
             )
         return value
+    
+    def validate_password(self, value):
+        return validate_password_strength(value)
 
     def validate(self, data):
         # Passwords must match
@@ -134,7 +155,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password     = serializers.CharField(write_only=True)
-    new_password     = serializers.CharField(write_only=True, min_length=6)
+    new_password     = serializers.CharField(write_only=True, min_length=8)
     confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, data):
@@ -143,6 +164,9 @@ class ChangePasswordSerializer(serializers.Serializer):
                 'confirm_password': 'New passwords do not match.'
             })
         return data
+    
+    def validate_new_password(self, value):
+        return validate_password_strength(value)
     
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -158,7 +182,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     token            = serializers.UUIDField()
-    new_password     = serializers.CharField(write_only=True, min_length=6)
+    new_password     = serializers.CharField(write_only=True, min_length=8)
     confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, data):
@@ -167,3 +191,6 @@ class ResetPasswordSerializer(serializers.Serializer):
                 'confirm_password': 'Passwords do not match.'
             })
         return data
+    
+    def validate_new_password(self, value):
+        return validate_password_strength(value)
