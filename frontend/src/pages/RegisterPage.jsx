@@ -10,6 +10,14 @@ const ROLE_OPTIONS = [
   { value: 'workplace_supervisor', label: 'Workplace Supervisor' },
 ];
 
+const PASSWORD_RULES = [
+  { key: 'length',    label: 'At least 8 characters',        test: (pw) => pw.length >= 8 },
+  { key: 'uppercase', label: 'At least one uppercase letter', test: (pw) => /[A-Z]/.test(pw) },
+  { key: 'lowercase', label: 'At least one lowercase letter', test: (pw) => /[a-z]/.test(pw) },
+  { key: 'number',    label: 'At least one number',           test: (pw) => /[0-9]/.test(pw) },
+  { key: 'special',   label: 'At least one special character', test: (pw) => /[^a-zA-Z0-9]/.test(pw) },
+];
+
 export default function RegisterPage() {
   const [form, setForm] = useState({
     full_name: '',
@@ -55,13 +63,19 @@ export default function RegisterPage() {
     setError('');
     setFieldErrors({});
 
+    const allRulesMet = PASSWORD_RULES.every((rule) => rule.test(form.password));
+    if (!allRulesMet) {
+      setFieldErrors({ password: 'Password does not meet all requirements.' });
+      return;
+    }
+
     if (form.password !== form.confirm_password) {
       setFieldErrors({ confirm_password: 'Passwords do not match.' });
       return;
     }
 
-    if (form.password.length < 6) {
-      setFieldErrors({ password: 'Password must be at least 6 characters.' });
+    if (form.password.length < 8) {
+      setFieldErrors({ password: 'Password must be at least 8 characters.' });
       return;
     }
 
@@ -289,6 +303,15 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
               />
+              {form.password.length > 0 && (
+                <ul className="password-requirements">
+                  {PASSWORD_RULES.map((rule) => (
+                    <li key={rule.key} className={`password-req-item ${rule.test(form.password) ? 'met' : 'unmet'}`}>
+                      {rule.test(form.password) ? '✓' : '✗'} {rule.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
               {fieldErrors.password && (
                 <div className="auth-field-error">
                   {fieldErrors.password}
@@ -309,6 +332,11 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
               />
+              {form.confirm_password.length > 0 && (
+                <p className={`password-match-status ${form.password === form.confirm_password ? 'matched' : ''}`}>
+                  {form.password === form.confirm_password ? '✓ Passwords match' : '✗ Passwords must match'}
+                </p>
+              )}
               {fieldErrors.confirm_password && (
                 <div className="auth-field-error">
                   {fieldErrors.confirm_password}
