@@ -14,16 +14,16 @@ const isAdmin = () => context.user?.role === ROLES.ADMIN;
 const isWorkplaceSupervisor = () => context.user?.role === ROLES.WORKPLACE_SUPERVISOR;                                                   
 const isAcademicSupervisor = () => context.user?.role === ROLES.ACADEMIC_SUPERVISOR;                                                    
                                                                 
-const getDashboardPath = () => {                                            
-    if (!context.user) return '/login';
-    switch (context.user.role) {                                              
-    case ROLES.STUDENT: return '/student/dashboard';         
-    case ROLES.ADMIN: return '/admin/dashboard';                            
-    case ROLES.ACADEMIC_SUPERVISOR: return '/supervisor/dashboard';
-    case ROLES.WORKPLACE_SUPERVISOR: return '/workplace/dashboard';        
-    default: return '/login';                                               
+const getDashboardPath = (userObj = context.user) => {                                            
+    if (!userObj) return '/login';
+    switch (userObj.role) {                                              
+        case ROLES.STUDENT: return '/student/dashboard';         
+        case ROLES.ADMIN: return '/admin/dashboard';                            
+        case ROLES.ACADEMIC_SUPERVISOR: return '/supervisor/dashboard';
+        case ROLES.WORKPLACE_SUPERVISOR: return '/workplace/dashboard';        
+        default: return '/login';                                               
     }
-};                                                                          
+};                                                                        
                                                                 
 return {
     ...context,
