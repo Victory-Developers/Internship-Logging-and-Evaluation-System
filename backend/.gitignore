@@ -7,3 +7,7 @@ pycache/
 *$py.class
 
 staticfiles/
+
+# Gmail service auth
+run_once.py
+credentials.json

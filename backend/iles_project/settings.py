@@ -131,14 +131,18 @@ FRONTEND_LOGIN_URL = os.getenv('FRONTEND_LOGIN_URL', 'http://localhost:5173/logi
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
 # Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_TIMEOUT = 10 
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_TIMEOUT = 10 
+#EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+#EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+#DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
+
+GMAIL_CLIENT_ID = os.getenv('GMAIL_CLIENT_ID')
+GMAIL_CLIENT_SECRET = os.getenv('GMAIL_CLIENT_SECRET')
+GMAIL_REFRESH_TOKEN = os.getenv('GMAIL_REFRESH_TOKEN')
 
 CORS_ALLOWED_ORIGINS = [
     "https://internship-logging-and-evaluation-s.vercel.app",
@@ -146,4 +150,4 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-RESEND_API_KEY = os.getenv('RESEND_API_KEY')
+#RESEND_API_KEY = os.getenv('RESEND_API_KEY')
