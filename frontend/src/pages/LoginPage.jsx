@@ -3,16 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import '../styles/auth.css';
 
-const ROLE_OPTIONS = [
-  { value: 'student', label: 'Student' },
-  { value: 'academic_supervisor', label: 'Supervisor' },
-  { value: 'admin', label: 'Admin' },
-];
-
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('student');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -25,11 +18,11 @@ export default function LoginPage() {
     setLoading(true);
 
     // Logging for your browser console to verify what is being sent
-    console.log(`Attempting login for role: ${selectedRole}, email: ${email}`);
+    console.log(`Attempting login for role: email: ${email}`);
 
     try {
       // Pass the role to the login function
-      await login(email, password, selectedRole);
+      await login(email, password);
       
       const path = getDashboardPath();
       console.log(`Login successful! Redirecting to: ${path}`);
@@ -44,10 +37,10 @@ export default function LoginPage() {
         setError('Network error: Cannot reach the server. Please check your connection.');
       } else if (err.response.status === 401) {
         // Wrong credentials
-        setError('Invalid email or password for the selected role.');
+        setError('Invalid email or password.');
       } else if (err.response.status === 403) {
         // Role mismatch or restricted access
-        setError('Access denied: You do not have permission to log in as ' + selectedRole);
+        setError('Access denied: You do not have permission to log in.');
       } else if (err.response.status === 422) {
         // Backend validation failed
         setError('Validation error: Please check if your email format is correct.');
@@ -87,22 +80,6 @@ export default function LoginPage() {
           <h2 className="auth-form-title">Welcome back</h2>
           <p className="auth-form-subtitle">Sign in to your account</p>
 
-          <div className="role-selector">
-            {ROLE_OPTIONS.map((role) => (
-              <button
-                key={role.value}
-                type="button"
-                className={`role-btn ${selectedRole === role.value ? 'active' : ''}`}
-                onClick={() => {
-                    setSelectedRole(role.value);
-                    setError(''); // Clear error when switching roles
-                }}
-              >
-                {role.label}
-              </button>
-            ))}
-          </div>
-
           {error && (
             <div className="auth-error" style={{ borderLeft: '4px solid #ff4d4d', padding: '10px', marginBottom: '15px' }}>
               <strong>Login Failed:</strong> {error}
@@ -118,7 +95,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 className="auth-input"
-                placeholder={`Enter your ${selectedRole.replace('_', ' ')} email`}
+                placeholder={`Enter your email`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
