@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Input, Textarea, Btn, StatusBadge, Spinner, toast } from '../../components/UI';
+import { Card, Field, Input, Textarea, Btn, StatusBadge, Spinner } from '../../components/UI';
 
 const formatDate = (s) => s
   ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -139,9 +140,9 @@ function PlacementSubmitForm({ onSuccess }) {
       const res = await api.post(ENDPOINTS.INVITE_SUPERVISOR, { email: form.invited_supervisor_email });
       setInviteStatus(res.data);
       if (res.data.status === 'existing') setLinkedSupervisor(res.data.user);
-      toast(res.data.message);
+      toast.info(res.data.message);
     } catch (err) {
-      toast(err.response?.data?.message || 'Failed to invite', 'error');
+      // Systemic error broadcasting is inherently managed by the global Axios interceptor.
     } finally { setInviting(false); }
   };
 
@@ -166,12 +167,15 @@ function PlacementSubmitForm({ onSuccess }) {
 
     try {
       await api.post(ENDPOINTS.STUDENT_PLACEMENT_SUBMIT, payload);
-      toast('Placement request submitted');
+      toast.success('Placement configuration successfully submitted for administrative review.');
       onSuccess();
     } catch (err) {
       const data = err.response?.data;
-      if (data && typeof data === 'object') { setErrors(data); toast('Please fix the errors', 'error'); }
-      else toast('Failed to submit placement', 'error');
+      if (data && typeof data === 'object') { 
+        setErrors(data); 
+        toast.warning('Validation failure. Rectify the highlighted input discrepancies.'); 
+      }
+      // Systemic routing errors handled by global interceptor.
     } finally { setSubmitting(false); }
   };
 
