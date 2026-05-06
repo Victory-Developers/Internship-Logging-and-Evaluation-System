@@ -1,4 +1,5 @@
 import { createContext, useReducer, useEffect, useContext } from 'react';
+import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { ENDPOINTS } from '../api/config';
 
@@ -81,6 +82,8 @@ export function AuthProvider({ children }) {
       payload: { user: profileResponse.data },
     });
 
+    toast.success('Session authorised. Access granted.');
+
     return profileResponse.data;
   };
 
@@ -98,6 +101,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('refresh_token');
 
     dispatch({ type: 'LOGOUT' });
+    
+    toast.info('Session terminated. Local credentials expunged.');
   };
 
   const value = {
@@ -114,7 +119,6 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
 
 export const useAuth = () => {
   return useContext(AuthContext);
