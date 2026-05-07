@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Btn, StatusBadge, Spinner, toast } from '../../components/UI';
+import { Card, Field, Btn, StatusBadge, Spinner } from '../../components/UI';
 
 const formatDate = (s) => s
   ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -17,7 +18,7 @@ export default function StudentViewLog() {
   useEffect(() => {
     api.get(ENDPOINTS.MY_LOG_DETAIL(id))
       .then(res => setLog(res.data))
-      .catch(() => toast('Failed to load log', 'error'));
+      .catch(() => toast('Failed to load log details. Please try again.'));
 
     api.get(ENDPOINTS.LOG_COMMENTS(id))
       .then(res => setComments(Array.isArray(res.data) ? res.data : res.data?.results || []))

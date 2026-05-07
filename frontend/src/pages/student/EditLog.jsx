@@ -59,9 +59,9 @@ export default function StudentEditLog() {
       
       if (andSubmit) {
         await api.post(ENDPOINTS.MY_LOG_SUBMIT(id));
-        toast.success('Log successfully committed to the academic registry.');
+        toast.success('Your log has been submitted successfully!');
       } else {
-        toast.info('Draft modifications retained locally.');
+        toast.info('Draft modifications saved successfully.');
       }
       navigate('/student/logs');
       
@@ -69,7 +69,7 @@ export default function StudentEditLog() {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
+        toast.warning('Please correct the highlighted errors in the form.');
       } 
       // Systemic routing and 5XX errors handled by global interceptor.
     } finally {

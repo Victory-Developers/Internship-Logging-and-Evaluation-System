@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
       payload: { user: profileResponse.data },
     });
 
-    toast.success('Session authorised. Access granted.');
+    toast.success('Login successful. Welcome back.');
 
     return profileResponse.data;
   };
@@ -102,7 +102,7 @@ export function AuthProvider({ children }) {
 
     dispatch({ type: 'LOGOUT' });
     
-    toast.info('Session terminated. Local credentials expunged.');
+    toast.info('You have logged out successfully.');
   };
 
   const value = {
