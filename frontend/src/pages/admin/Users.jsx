@@ -51,17 +51,16 @@ const handleApprove = async (user) => {
     setBusyId(user.id);                                                      
     try {                                                                                                                                                                            
         await api.post(ENDPOINTS.ADMIN_USER_APPROVE(user.id));
-        toast.success(`${user.full_name} has been granted operational clearance.`);                                                                                                                                           
+        toast.success(`${user.full_name} has been approved successfully.`);                                                                                                                                           
         list.refetch();                                                        
-    } catch (err) {                                                                                                                                                                  
-        // Systemic routing and HTTP validation errors are intercepted by the global Axios protocol.
+    } catch (err) {
     } finally {                                    
         setBusyId(null);                                                                                                                                                               
     }                                                
 };                                                                                                                                                                                 
                                                                             
 const handleReject = async (user) => {                                                                                                                                             
-    if (!confirm(`Reject ${user.full_name}? They will receive an email and won't be able to log in.`)) return;
+    if (!confirm(`${user.full_name}'s request has been rejected.`)) return;
     setBusyId(user.id);                                                                                                                                                              
     try {                                                                                                                                                                            
         await api.post(ENDPOINTS.ADMIN_USER_REJECT(user.id));      
