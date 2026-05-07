@@ -36,7 +36,7 @@ export default function SupervisorReviewLog() {
       const res = await api.post(ENDPOINTS.LOG_COMMENTS(id), { content: comment });
       setComments(prev => [...prev, res.data]);
       setComment('');
-      toast.success('Supervisory commentary successfully appended to the central registry.');
+      toast.success('Comment posted successfully.');
     } catch {
       // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
