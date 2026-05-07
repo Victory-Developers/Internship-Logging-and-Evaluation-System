@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Btn, Field, Input, Select, Textarea, toast, Card } from '../../components/UI';
+import { Btn, Field, Input, Select, Textarea, Card } from '../../components/UI';
 
 const DAY_OPTIONS = [
   { value: 1, label: 'Monday' },
@@ -39,7 +40,6 @@ export default function AdminCreatePlacement() {
   const [workplaceSupervisors, setWorkplaceSupervisors] = useState([]);
   const [academicSupervisors, setAcademicSupervisors] = useState([]);
 
-  // Company autocomplete
   const [companyQuery, setCompanyQuery] = useState('');
   const [companySuggestions, setCompanySuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -56,13 +56,12 @@ export default function AdminCreatePlacement() {
         setWorkplaceSupervisors(extractList(wpRes.data));
         setAcademicSupervisors(extractList(acRes.data));
       } catch {
-        toast('Failed to load supervisors/students', 'error');
+        // Systemic routing and 5XX errors handled by the global HTTP interceptor.
       }
     };
     loadUsers();
   }, []);
 
-  // Debounced company search
   useEffect(() => {
     if (companyQuery.length < 2) {
       setCompanySuggestions([]);
@@ -108,16 +107,15 @@ export default function AdminCreatePlacement() {
     setSubmitting(true);
     try {
       await api.post(ENDPOINTS.PLACEMENTS, payload);
-      toast('Placement created');
+      toast.success('Placement configuration successfully instantiated within the central registry.');
       navigate('/admin/placements');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast('Please fix the errors and try again', 'error');
-      } else {
-        toast('Failed to create placement', 'error');
-      }
+        toast.warning('Payload validation failure. Rectify the highlighted parameter discrepancies.');
+      } 
+      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setSubmitting(false);
     }
