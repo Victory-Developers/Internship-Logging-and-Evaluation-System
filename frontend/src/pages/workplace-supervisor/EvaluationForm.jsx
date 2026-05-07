@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Input, Btn, Spinner, toast } from '../../components/UI';
+import { Card, Field, Input, Btn, Spinner } from '../../components/UI';
 
 const CRITERIA = [
   { key: 'professionalism',  label: 'Professionalism' },
@@ -40,7 +41,9 @@ export default function WorkplaceEvaluationForm() {
           });
         }
       })
-      .catch(() => {})
+      .catch(() => {
+          // Network anomalies are intercepted and broadcast by the global HTTP interceptor.
+      })
       .finally(() => setLoading(false));
   }, [placementId]);
 
@@ -68,20 +71,19 @@ export default function WorkplaceEvaluationForm() {
     try {
       if (existingId) {
         await api.patch(ENDPOINTS.WP_EVALUATION_DETAIL(existingId), payload);
-        toast('Evaluation updated');
+        toast.success('Workplace evaluation rubric successfully modified and committed to the registry.');
       } else {
         await api.post(ENDPOINTS.WP_EVALUATIONS, payload);
-        toast('Evaluation submitted');
+        toast.success('Workplace evaluation successfully submitted.');
       }
       navigate('/workplace/evaluations');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast('Please fix the errors', 'error');
-      } else {
-        toast('Failed to save evaluation', 'error');
+        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
       }
+      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setSubmitting(false);
     }
