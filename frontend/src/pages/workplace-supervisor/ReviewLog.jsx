@@ -32,7 +32,7 @@ export default function WorkplaceReviewLog() {
 
   const handleReview = async (action) => {
     if (action === 'reject' && !comment.trim()) {
-      toast.warning('Mandatory commentary required for rejection payload.');
+      toast.warning('A comment is required when rejecting a log.');
       return;
     }
     setReviewing(true);
@@ -40,10 +40,9 @@ export default function WorkplaceReviewLog() {
       const payload = { action };
       if (comment.trim()) payload.comment = comment;
       await api.post(ENDPOINTS.WP_LOG_REVIEW(id), payload);
-      toast.success(`Activity log status successfully mutated to: ${action}.`);
+      toast.success(`Log has been ${action === 'approve' ? 'approved' : 'rejected'} successfully.`);
       navigate('/workplace/logs');
     } catch (err) {
-      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setReviewing(false);
     }
@@ -56,9 +55,8 @@ export default function WorkplaceReviewLog() {
       const res = await api.post(ENDPOINTS.LOG_COMMENTS(id), { content: comment });
       setComments(prev => [...prev, res.data]);
       setComment('');
-      toast.success('Supervisory commentary successfully appended to the central registry.');
+      toast.success('Comment posted successfully!');
     } catch {
-      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setPosting(false);
     }

@@ -71,19 +71,18 @@ export default function WorkplaceEvaluationForm() {
     try {
       if (existingId) {
         await api.patch(ENDPOINTS.WP_EVALUATION_DETAIL(existingId), payload);
-        toast.success('Workplace evaluation rubric successfully modified and committed to the registry.');
+        toast.success('Evaluation updated successfully!');
       } else {
         await api.post(ENDPOINTS.WP_EVALUATIONS, payload);
-        toast.success('Workplace evaluation successfully submitted.');
+        toast.success('Evaluation submitted successfully!');
       }
       navigate('/workplace/evaluations');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
+        toast.warning('Please correct the highlighted errors in the form.');
       }
-      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setSubmitting(false);
     }
