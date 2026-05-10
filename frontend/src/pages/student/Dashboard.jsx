@@ -355,8 +355,51 @@ export default function StudentDashboard() {
           </div>
 
           {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', color: '#6b7280' }}>
-              Loading...
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    {['Week', 'Period', 'Activities (Preview)', 'Status', 'Actions'].map((h) => (
+                      <th
+                        key={h}
+                        style={{
+                          padding: '12px 16px',
+                          textAlign: 'left',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: '#6b7280',
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[1, 2, 3, 4].map((idx) => (
+                    <tr key={idx} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div className="skeleton-box" style={{ width: 36, height: 36, borderRadius: 8 }} />
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div className="skeleton-box" style={{ height: '1.25rem', width: '120px' }} />
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div className="skeleton-box" style={{ height: '1.25rem', width: '90%' }} />
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div className="skeleton-box" style={{ height: '1.5rem', width: '70px', borderRadius: 12 }} />
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div className="skeleton-box" style={{ height: '2rem', width: '60px', borderRadius: 4 }} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : logs.length === 0 ? (
             <div style={{ padding: '2rem 1.5rem', textAlign: 'center' }}>
