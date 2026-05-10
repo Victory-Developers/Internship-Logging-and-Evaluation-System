@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import NotificationBell from '../components/NotificationBell';
 import '../styles/layout.css';
+import logoImg from '../assets/Gemini_Generated_Image_sb9z89sb9z89sb9z.png';
 
 export default function AdminLayout() {
 const { user, logout } = useAuth();
@@ -17,7 +18,7 @@ return (
     <aside className="sidebar sidebar-admin">
 
         <div className="sidebar-brand">
-        <div className="sidebar-brand-icon"></div>
+        <img src={logoImg} alt="ILES Logo" className="sidebar-brand-icon" style={{ objectFit: 'contain' }} />
         <div>
             <div className="sidebar-brand-text">ILES Admin</div>
         </div>
