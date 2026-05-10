@@ -9,8 +9,8 @@ export default function StudentCreateLog() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     week_number: '',
-    start_date: '',
-    end_date: '',
+    week_start: '',
+    week_end: '',
     activities: '',
     learning: '',
     challenges: '',
@@ -65,11 +65,11 @@ export default function StudentCreateLog() {
             <Field label="Week Number" required error={errMsg('week_number')}>
               <Input type="number" min="1" value={form.week_number} onChange={setField('week_number')} required />
             </Field>
-            <Field label="Start Date" required error={errMsg('start_date')}>
-              <Input type="date" value={form.start_date} onChange={setField('start_date')} required />
+            <Field label="Start Date" required error={errMsg('week_start')}>
+              <Input type="date" value={form.week_start} onChange={setField('week_start')} required />
             </Field>
-            <Field label="End Date" required error={errMsg('end_date')}>
-              <Input type="date" value={form.end_date} onChange={setField('end_date')} required />
+            <Field label="End Date" required error={errMsg('week_end')}>
+              <Input type="date" value={form.week_end} onChange={setField('week_end')} required />
             </Field>
           </div>
 
