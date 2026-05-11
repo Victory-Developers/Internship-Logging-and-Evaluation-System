@@ -54,7 +54,7 @@ export default function StudentCreateLog() {
   };
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ width: '100%' }}>
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-headline-md)', fontWeight: 700, marginBottom: '1.5rem' }}>
         New Weekly Log
       </h1>

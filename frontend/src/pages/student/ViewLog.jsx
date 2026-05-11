@@ -13,16 +13,13 @@ export default function StudentViewLog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [log, setLog] = useState(null);
-  const [comments, setComments] = useState([]);
+  const comments = log?.comments || [];
 
   useEffect(() => {
     api.get(ENDPOINTS.MY_LOG_DETAIL(id))
       .then(res => setLog(res.data))
       .catch(() => toast('Failed to load log details. Please try again.'));
 
-    api.get(ENDPOINTS.LOG_COMMENTS(id))
-      .then(res => setComments(Array.isArray(res.data) ? res.data : res.data?.results || []))
-      .catch(() => {});
   }, [id]);
 
   if (!log) {
@@ -30,7 +27,7 @@ export default function StudentViewLog() {
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ width: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
           <Btn variant="ghost" size="sm" onClick={() => navigate('/student/logs')} style={{ marginBottom: 8 }}>
@@ -87,9 +84,9 @@ export default function StudentViewLog() {
                   marginBottom: 8,
                 }}>
                   <div style={{ fontSize: 12, color: '#9A938D', marginBottom: 4 }}>
-                    {c.author?.full_name || 'Supervisor'} — {formatDate(c.created_at)}
+                    {c.author_name || 'Supervisor'} — {formatDate(c.created_at)}
                   </div>
-                  <div style={{ fontSize: 14, color: '#1A1714', whiteSpace: 'pre-wrap' }}>{c.content || c.comment}</div>
+                  <div style={{ fontSize: 14, color: '#1A1714', whiteSpace: 'pre-wrap' }}>{c.comment}</div>
                 </div>
               ))}
             </div>
