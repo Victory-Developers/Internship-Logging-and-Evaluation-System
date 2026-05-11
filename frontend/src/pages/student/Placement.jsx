@@ -12,6 +12,46 @@ export default function StudentPlacement() {
   const [placement, setPlacement] = useState(undefined);
   const [showForm, setShowForm] = useState(false);
 
+  const [editingSupervisor, setEditingSupervisor] = useState(false);
+  const [invitedEmail, setInvitedEmail] = useState('');
+  const [inviteStatus, setInviteStatus] = useState(null);
+  const [inviting, setInviting] = useState(false);
+  const [linkedSupervisor, setLinkedSupervisor] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleInvite = async () => {
+    if (!invitedEmail) return;
+    setInviting(true);
+    try {
+      const res = await api.post(ENDPOINTS.INVITE_SUPERVISOR, { email: invitedEmail });
+      setInviteStatus(res.data);
+      if (res.data.status === 'existing') setLinkedSupervisor(res.data.user);
+      toast.info(res.data.message);
+    } catch (err) {
+      // Errors handled by global interceptor
+    } finally { setInviting(false); }
+  };
+
+  const handleSaveSupervisor = async () => {
+    setSaving(true);
+    try {
+      const payload = { invited_supervisor_email: invitedEmail };
+      if (linkedSupervisor) {
+        payload.workplace_supervisor = linkedSupervisor.id;
+      } else {
+        payload.workplace_supervisor = 0; // Clear existing link on backend
+      }
+      await api.patch(ENDPOINTS.MY_PLACEMENT, payload);
+      toast.success('Workplace supervisor details saved successfully!');
+      setEditingSupervisor(false);
+      load();
+    } catch (err) {
+      toast.error('Failed to update supervisor details.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const load = () => {
     api.get(ENDPOINTS.MY_PLACEMENT)
       .then(res => { setPlacement(res.data); setShowForm(false); })
@@ -75,15 +115,46 @@ export default function StudentPlacement() {
               <div style={detailStyle}>{placement.duration_days} days</div>
             </Field>
           )}
-          <Field label="Workplace Supervisor">
-            <div style={detailStyle}>
-              {placement.workplace_supervisor
-                ? `${placement.workplace_supervisor.full_name} (${placement.workplace_supervisor.email})`
-                : placement.invited_supervisor_email
-                  ? `Invited: ${placement.invited_supervisor_email}`
-                  : '—'}
+          {editingSupervisor ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--surface-container-low)', padding: '1.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid #E2DDD6' }}>
+              <Field label="Workplace Supervisor Email" hint="Enter their email to invite or link them">
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Input type="email" value={invitedEmail} onChange={e => { setInvitedEmail(e.target.value); setInviteStatus(null); setLinkedSupervisor(null); }} style={{ flex: 1 }} />
+                  <Btn variant="secondary" type="button" onClick={handleInvite} loading={inviting} disabled={!invitedEmail}>Check / Invite</Btn>
+                </div>
+              </Field>
+              {inviteStatus && (
+                <div style={{ padding: '8px 12px', background: inviteStatus.status === 'existing' ? '#D8EDDF' : '#FDF3DC', borderRadius: 8, fontSize: 13, color: inviteStatus.status === 'existing' ? '#1B4332' : '#B5882A' }}>
+                  {inviteStatus.message}
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <Btn variant="ghost" onClick={() => setEditingSupervisor(false)}>Cancel</Btn>
+                <Btn variant="primary" onClick={handleSaveSupervisor} loading={saving}>Save Supervisor</Btn>
+              </div>
             </div>
-          </Field>
+          ) : (
+            <Field label="Workplace Supervisor">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ ...detailStyle, flex: 1 }}>
+                  {placement.workplace_supervisor
+                    ? `${placement.workplace_supervisor.full_name} (${placement.workplace_supervisor.email})`
+                    : placement.invited_supervisor_email
+                      ? `Invited: ${placement.invited_supervisor_email}`
+                      : '—'}
+                </div>
+                <Btn variant="secondary" size="sm" onClick={() => {
+                  setInvitedEmail(placement.invited_supervisor_email || '');
+                  setInviteStatus(null);
+                  setLinkedSupervisor(null);
+                  setEditingSupervisor(true);
+                }}>
+                  {placement.workplace_supervisor || placement.invited_supervisor_email ? 'Change' : 'Add Supervisor'}
+                </Btn>
+              </div>
+            </Field>
+
+          )}
           <Field label="Academic Supervisor">
             <div style={detailStyle}>
               {placement.academic_supervisor
