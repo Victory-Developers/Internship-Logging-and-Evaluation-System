@@ -106,7 +106,7 @@ export default function SupervisorReviewLog() {
                 marginBottom: 8,
               }}>
                 <div style={{ fontSize: 12, color: '#9A938D', marginBottom: 4 }}>
-                  {c.author_name || 'Supervisor'} — {formatDate(c.created_at)}}
+                  {c.author_name || 'Supervisor'} — {formatDate(c.created_at)}
                 </div>
                 <div style={{ fontSize: 14, color: '#1A1714', whiteSpace: 'pre-wrap' }}>{c.comment}</div>
               </div>
