@@ -16,6 +16,7 @@ import StudentCreateLog from './pages/student/CreateLog';
 import StudentEditLog from './pages/student/EditLog';
 import StudentViewLog from './pages/student/ViewLog';
 import StudentScores from './pages/student/Scores';
+import StudentSubmitReport from './pages/student/SubmitReport';
 
 // Academic Supervisor pages
 import SupervisorDashboard from './pages/academic-supervisor/Dashboard';
@@ -90,6 +91,7 @@ export default function App() {
         <Route path="logs/:id" element={<StudentViewLog />} />
         <Route path="logs/:id/edit" element={<StudentEditLog />} />
         <Route path="scores" element={<StudentScores />} />
+        <Route path="submit-report" element={<StudentSubmitReport />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
