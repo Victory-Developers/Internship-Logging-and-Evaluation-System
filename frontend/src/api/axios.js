@@ -26,6 +26,16 @@ const parseBackendError = (error) => {
             // Skip general details/message if they weren't strings (already handled above)
             if (key === 'detail' || key === 'message') continue;
 
+            // General validation/credential errors (non_field_errors) should not have field prefix
+            if (key === 'non_field_errors') {
+                if (Array.isArray(value)) {
+                    errorMessages.push(value.join(', '));
+                } else if (typeof value === 'string') {
+                    errorMessages.push(value);
+                }
+                continue;
+            }
+
             // Format field keys like 'job_title' to 'Job Title'
             const fieldName = key
                 .replace(/_/g, ' ')
