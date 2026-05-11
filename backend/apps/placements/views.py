@@ -140,11 +140,10 @@ class PlacementDetailView(generics.RetrieveUpdateDestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
-# ─── Student: view own placement ──────────────────────────────────────────────
-
 class MyPlacementView(APIView):
     """
-    GET /api/placements/my/   — Student: get own placement details.
+    GET   /api/placements/my/   — Student: get own placement details.
+    PATCH /api/placements/my/   — Student: update workplace supervisor info.
     """
     permission_classes = [IsStudent]
 
@@ -167,6 +166,45 @@ class MyPlacementView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         return Response(PlacementSerializer(placement).data)
+
+    @extend_schema(
+        request=PlacementSerializer,
+        responses={
+            200: PlacementSerializer,
+            404: OpenApiResponse(description='No placement assigned yet'),
+        },
+        description='Update the workplace supervisor info for the student\'s placement.',
+        tags=['Placements — Student'],
+    )
+    def patch(self, request):
+        try:
+            placement = Placement.objects.get(student=request.user)
+        except Placement.DoesNotExist:
+            return Response(
+                {'detail': 'You do not have a placement request to update.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        invited_email = request.data.get('invited_supervisor_email', '').strip()
+        workplace_supervisor_id = request.data.get('workplace_supervisor')
+
+        if invited_email:
+            placement.invited_supervisor_email = invited_email
+        
+        if workplace_supervisor_id is not None:
+            if workplace_supervisor_id == '' or workplace_supervisor_id == 0:
+                placement.workplace_supervisor = None
+            else:
+                from apps.users.models import User
+                try:
+                    supervisor = User.objects.get(id=workplace_supervisor_id, role='workplace_supervisor')
+                    placement.workplace_supervisor = supervisor
+                except User.DoesNotExist:
+                    pass
+
+        placement.save()
+        return Response(PlacementSerializer(placement).data)
+
 
 class StudentPlacementSubmitView(APIView):
     """
