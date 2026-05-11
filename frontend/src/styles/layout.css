@@ -195,181 +195,63 @@ color: var(--primary);
 padding: var(--space-8);
 }
 
-/* STUDENT SIDEBAR (light theme) */
-.sidebar-student {
-background-color: var(--surface-container-high);
-}
-
-.sidebar-student .sidebar-brand-icon {
-background: var(--primary);
-color: var(--on-primary);
-}
-
-.sidebar-student .sidebar-brand-text {
-color: var(--primary);
-}
-
-.sidebar-student .nav-link {
-color: var(--on-surface-variant);
-}
-
-.sidebar-student .nav-link:hover {
-background: var(--surface-container-lowest);
-color: var(--primary);
-}
-
-.sidebar-student .nav-link.active {
-background: var(--secondary);
-color: var(--on-surface);
-font-weight: 600;
-}
-
-.sidebar-student .sidebar-cta-btn {
-background: var(--primary);
-color: var(--on-primary);
-}
-
-.sidebar-student .sidebar-footer-link {
-color: var(--on-surface-variant);
-}
-
-/*ADMIN SIDEBAR (dark theme) */
-.sidebar-admin {
-background: linear-gradient(180deg, var(--primary) 0%,
-var(--primary-container) 100%);
-}
-
-.sidebar-admin .sidebar-brand-icon {
-background: var(--secondary);
-color: var(--primary);
-}
-
-.sidebar-admin .sidebar-brand-text {
-color: var(--on-primary);
-}
-
-.sidebar-admin .sidebar-brand-subtitle {
-color: rgba(255, 255, 255, 0.6);
-}
-
-.sidebar-admin .nav-link {
-color: rgba(255, 255, 255, 0.7);
-}
-
-.sidebar-admin .nav-link:hover {
-background: rgba(255, 255, 255, 0.1);
-color: var(--on-primary);
-}
-
-.sidebar-admin .nav-link.active {
-background: var(--secondary);
-color: var(--primary);
-font-weight: 600;
-}
-
-.sidebar-admin .sidebar-cta-btn {
-background: var(--secondary);
-color: var(--primary);
-}
-
-.sidebar-admin .sidebar-footer-link {
-color: rgba(255, 255, 255, 0.7);
-}
-
-/* SUPERVISOR SIDEBAR (dark theme, university branding) */
+/* STUDENT, ADMIN, SUPERVISOR SIDEBARS (unified light theme) */
+.sidebar-student,
+.sidebar-admin,
 .sidebar-supervisor {
-background: linear-gradient(180deg, var(--primary) 0%,
-var(--primary-container) 100%);
-}
-
-.sidebar-supervisor .sidebar-brand-text {
-color: var(--on-primary);
-}
-
-.sidebar-supervisor .sidebar-brand-subtitle {
-color: rgba(255, 255, 255, 0.6);
-}
-
-.sidebar-supervisor .nav-link {
-color: rgba(255, 255, 255, 0.7);
-}
-
-.sidebar-supervisor .nav-link:hover {
-background: rgba(255, 255, 255, 0.1);
-color: var(--on-primary);
-}
-
-.sidebar-supervisor .nav-link.active {
-background: var(--secondary);
-color: var(--primary);
-font-weight: 600;
-}
-
-.sidebar-supervisor .sidebar-footer-link {
-color: rgba(255, 255, 255, 0.7);
-}
-
-/* PROFILE & LOGOUT PEBBLE BUTTONS */
-.sidebar-logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  border-radius: var(--radius-btn);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--text-body-md);
-  transition: opacity var(--transition-fast), background-color var(--transition-fast);
-  cursor: pointer;
-  background-color: #dc2626;
-  color: #ffffff !important;
-  border: none;
-  width: 100%;
-  text-decoration: none;
-  box-sizing: border-box;
-}
-
-.sidebar-logout-btn:hover {
-  opacity: 0.9;
-  background-color: #b91c1c;
-  text-decoration: none;
-}
-
-.sidebar-profile-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  border-radius: var(--radius-btn);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--text-body-md);
-  transition: opacity var(--transition-fast), background-color var(--transition-fast);
-  cursor: pointer;
-  background-color: var(--surface-container-highest);
-  color: var(--on-surface) !important;
-  border: 1px solid var(--outline-variant);
-  width: 100%;
-  text-decoration: none;
-  box-sizing: border-box;
-}
-
-.sidebar-profile-link:hover {
   background-color: var(--surface-container-high);
-  text-decoration: none;
 }
 
-/* For dark layouts (Admin/Supervisor) we want transparent white background styling */
-.sidebar-admin .sidebar-profile-link,
-.sidebar-supervisor .sidebar-profile-link {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--on-primary) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.sidebar-student .sidebar-brand-icon,
+.sidebar-admin .sidebar-brand-icon,
+.sidebar-supervisor .sidebar-brand-icon {
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
-.sidebar-admin .sidebar-profile-link:hover,
-.sidebar-supervisor .sidebar-profile-link:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+.sidebar-student .sidebar-brand-text,
+.sidebar-admin .sidebar-brand-text,
+.sidebar-supervisor .sidebar-brand-text {
+  color: var(--primary);
+}
+
+.sidebar-student .sidebar-brand-subtitle,
+.sidebar-admin .sidebar-brand-subtitle,
+.sidebar-supervisor .sidebar-brand-subtitle {
+  color: var(--on-surface-variant);
+  opacity: 0.75;
+}
+
+.sidebar-student .nav-link,
+.sidebar-admin .nav-link,
+.sidebar-supervisor .nav-link {
+  color: var(--on-surface-variant);
+}
+
+.sidebar-student .nav-link:hover,
+.sidebar-admin .nav-link:hover,
+.sidebar-supervisor .nav-link:hover {
+  background: var(--surface-container-lowest);
+  color: var(--primary);
+}
+
+.sidebar-student .nav-link.active,
+.sidebar-admin .nav-link.active,
+.sidebar-supervisor .nav-link.active {
+  background: var(--secondary);
+  color: var(--on-surface);
+  font-weight: 600;
+}
+
+.sidebar-student .sidebar-cta-btn,
+.sidebar-admin .sidebar-cta-btn,
+.sidebar-supervisor .sidebar-cta-btn {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.sidebar-student .sidebar-footer-link,
+.sidebar-admin .sidebar-footer-link,
+.sidebar-supervisor .sidebar-footer-link {
+  color: var(--on-surface-variant);
 }
