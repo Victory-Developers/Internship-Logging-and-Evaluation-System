@@ -49,5 +49,11 @@ ADMIN_SCORES: '/evaluations/admin/scores/',
 // Admin                                                                    
 ADMIN_USERS: '/admin/users/',                                
 ADMIN_PENDING_USERS: '/admin/users/pending/',
-ADMIN_REPORTS: '/admin/reports/',                                           
+ADMIN_PENDING_USERS_COUNT: '/admin/users/pending/count/',                                                                                                             
+ADMIN_USER_REJECT: (id) => `/admin/users/${id}/reject/`,  
+ADMIN_DASHBOARD: '/admin/dashboard/',
+ADMIN_REPORTS: '/admin/reports/',  
+
+// Placement detail                                                          
+PLACEMENT_DETAIL: (id) => `/placements/${id}/`,      
 };

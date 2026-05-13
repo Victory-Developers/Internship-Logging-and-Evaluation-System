@@ -4,6 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter 
 
 from .models import Placement
 from .serializers import PlacementSerializer, PlacementCreateSerializer
@@ -24,14 +26,14 @@ class PlacementListCreateView(generics.ListCreateAPIView):
             return PlacementCreateSerializer
         return PlacementSerializer
 
-    def get_queryset(self):
-        qs = Placement.objects.select_related(
-            'student', 'workplace_supervisor', 'academic_supervisor', 'created_by'
-        )
-        status_filter = self.request.query_params.get('status')
-        if status_filter:
-            qs = qs.filter(status=status_filter)
-        return qs
+    queryset = Placement.objects.select_related(
+        'student', 'workplace_supervisor', 'academic_supervisor', 'created_by'                                                                                                       
+    )                                  
+    filter_backends    = [DjangoFilterBackend, SearchFilter, OrderingFilter]                                                                                                         
+    filterset_fields   = ['status']                                          
+    search_fields      = ['company_name', 'job_title', 'student__full_name', 'workplace_supervisor__full_name']                                                                      
+    ordering_fields    = ['start_date', 'created_at', 'company_name']                                          
+    ordering           = ['-created_at']   
 
     @extend_schema(
         description='List all internship placements. Filter by ?status=active|completed|cancelled.',
