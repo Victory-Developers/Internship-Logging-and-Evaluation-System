@@ -1,3 +1,27 @@
+import React from 'react'
+
+const Sidebar = ({ setSelectedFeature }) => {
+    const menuItems =[
+        { id: 'dashboard', label: 'Dashboard' },
+        { id: 'users', label: 'Users' },
+        { id: 'placements', label: 'Placements' },
+        { id: 'internships', label: 'Internships'},
+        { id: 'reports', label: 'Reports' },
+    ];
+
+    return (
+        <div style={sidebarStyle}>
+          <h2 style={{ color: 'white', padding: '20px' }}>Admin Panel</h2>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {menuItems.map((item) => (
+              <li 
+                key={item.id} 
+                onClick={() => setSelectedFeature(item.id)}
+                style={menuItemStyle}
+              >
+                {item.label}
+              </li>
+            ))}
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
