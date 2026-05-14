@@ -10,6 +10,16 @@ from apps.users.serializers import UserProfileSerializer
 from apps.placements.models import Placement
 from apps.logs.models import WeeklyLog
 from apps.evaluations.models import WorkplaceEvaluation, AcademicEvaluation
+
+from django.core.mail import send_mail             
+from django.conf import settings   
+
+from django_filters.rest_framework import DjangoFilterBackend                                                                                                                        
+from rest_framework.filters import SearchFilter, OrderingFilter                                                                                                                                                 
+import logging                                                                                                                                                                       
+                                                    
+logger = logging.getLogger(__name__)
+
 # moduless....
 
 # ─── User management ──────────────────────────────────────────────────────────
@@ -28,6 +38,20 @@ class PendingUsersView(generics.ListAPIView):
     def get_queryset(self):
         return CustomUser.objects.filter(status='pending').order_by('date_joined')
 
+class PendingUsersCountView(APIView):                                                                                                                                                
+    """                                                                      
+    GET /api/admin/users/pending/count/   — Admin: count of pending-approval users                                                                                                   
+    """                                                                      
+    permission_classes = [IsAdmin]                                                                                                                                                   
+                            
+    @extend_schema(                                                                                                                                                                  
+        responses={200: OpenApiResponse(description='{"count": <int>}')},    
+        description='Returns just the count of users awaiting approval. Used for the admin notification badge.',                                                                     
+        tags=['Admin — User Management'],                                    
+    )                                                            
+    def get(self, request):                                                                                                                                                          
+        count = CustomUser.objects.filter(status='pending').count()
+        return Response({'count': count})  
 
 class ApproveUserView(APIView):
     """
@@ -45,28 +69,44 @@ class ApproveUserView(APIView):
         description='Approve a pending user account. Sets status to "active".',
         tags=['Admin — User Management'],
     )
-    def post(self, request, pk):
-        try:
-            user = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
-            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        if user.status != 'pending':
-            return Response(
+    def post(self, request, pk):                                                                                                                                                     
+        try:                                                     
+            user = CustomUser.objects.get(pk=pk)                                                                                                                                     
+        except CustomUser.DoesNotExist:                                      
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)                                                                                         
+                                                                            
+        if user.status != 'pending':               
+            return Response(                                                                                                                                                         
                 {'detail': f'User status is already "{user.status}".'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+                status=status.HTTP_400_BAD_REQUEST                                                                                                                                   
+            )                                                                
+                                                                
         user.status = 'active'
-        user.save()
-        return Response({
-            'message':  f'{user.full_name} has been approved.',
-            'user_id':  user.id,
-            'email':    user.email,
-            'role':     user.role,
-            'status':   user.status,
-        })
-
+        user.save()                                                                                                                                                                  
+                                        
+        try:                                                                                                                                                                         
+            send_mail(                                                       
+                subject='Your ILES account has been approved',                                                                                                                       
+                message=(   
+                    f'Hello {user.full_name},\n\n'                                                                                                                                   
+                    f'Your ILES (Internship Logging & Evaluation System) account has been approved.\n'
+                    f'You can now log in at: {settings.FRONTEND_LOGIN_URL}\n\n'
+                    f'Email used: {user.email}\n\n'
+                    f'— ILES Team'                                                                                                                                                   
+                ),                                               
+                from_email=settings.DEFAULT_FROM_EMAIL,                                                                                                                              
+                recipient_list=[user.email],                                 
+                fail_silently=False,                                                                                                                                                 
+            )                                      
+        except Exception as e:                                                                                                                                                       
+            logger.warning(f'Approval email failed for {user.email}: {e}')                                                                                                           
+        return Response({                                                                                                                                                            
+            'message':  f'{user.full_name} has been approved.',                                                                                                                      
+            'user_id':  user.id,                                             
+            'email':    user.email,                                                                                                                                                  
+            'role':     user.role,                                           
+            'status':   user.status,                                                                                                                                                 
+        })  
 
 class RejectUserView(APIView):
     """
@@ -82,41 +122,63 @@ class RejectUserView(APIView):
         description='Reject a user account. Sets status to "rejected".',
         tags=['Admin — User Management'],
     )
-    def post(self, request, pk): # commit check...
-        try:
+    def post(self, request, pk):                                                                                                                                                     
+        try:                                                                 
             user = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
+        except CustomUser.DoesNotExist:                                                                                                                                              
             return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        user.status = 'rejected'
-        user.save()
-        return Response({
-            'message': f'{user.full_name} has been rejected.',
-            'user_id': user.id,
-            'status':  user.status,
-        })
+                                                                                                                                                                                    
+        user.status = 'rejected'                                             
+        user.save()                                              
+                                        
+        try:                                       
+            send_mail(                   
+                subject='Update on your ILES account application',                                                                                                                   
+                message=(              
+                    f'Hello {user.full_name},\n\n'                                                                                                                                   
+                    f'Thank you for registering with ILES (Internship Logging & Evaluation System). '
+                    f'Unfortunately, your account application was not approved at this time.\n\n'                                                                                    
+                    f'If you believe this is an error, please contact your administrator.\n\n'
+                    f'— ILES Team'                               
+                ),                                               
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],                                                                                                                                         
+                fail_silently=False,               
+            )
+        except Exception as e:                                                                                                                                                                        
+            logger.warning(f'Rejection email failed for {user.email}: {e}')                                                                                                          
+                                                                                                                                                                                  
+        return Response({                                                                                                                                                            
+            'message': f'{user.full_name} has been rejected.',                                                                                                                       
+            'user_id': user.id,                                              
+            'status':  user.status,                                                                                                                                                  
+        })   
 
 
 class AllUsersView(generics.ListAPIView):
     """
-    GET /api/admin/users/   — Admin: list all users with optional role filter
+    GET /api/admin/users/   — Admin: list all users with pagination, search, and filters
     """
     permission_classes = [IsAdmin]
     serializer_class   = UserProfileSerializer
+    queryset           = CustomUser.objects.all()
 
-    @extend_schema(
-        description='List all users. Filter by ?role=student|workplace_supervisor|academic_supervisor|admin and/or ?status=pending|active|rejected.',
-        tags=['Admin — User Management'],
-    )
-    def get_queryset(self):
-        qs            = CustomUser.objects.all().order_by('role', 'full_name')
-        role_filter   = self.request.query_params.get('role')
-        status_filter = self.request.query_params.get('status')
-        if role_filter:
-            qs = qs.filter(role=role_filter)
-        if status_filter:
-            qs = qs.filter(status=status_filter)
-        return qs
+    filter_backends    = [DjangoFilterBackend, SearchFilter, OrderingFilter]                                                                                                         
+    filterset_fields   = ['role', 'status']
+    search_fields      = ['email', 'full_name', 'student_number']                                                                                                                    
+    ordering_fields    = ['date_joined', 'full_name', 'role']                
+    ordering           = ['-date_joined']
+
+    @extend_schema(                                                                                                                                                                  
+        description=(                                                                                                                                                                
+            'List all users with pagination. '
+            'Filter by ?role=&status=. '                                                                                                                                             
+            'Order with ?ordering=date_joined or -date_joined.'                                                                                                                      
+        ),                                                     
+        tags=['Admin — User Management'],                                                                                                                                            
+    )                                                                        
+    def get(self, request, *args, **kwargs):                                                                                                                                         
+        return super().get(request, *args, **kwargs) 
 
 
 # ─── System reports ───────────────────────────────────────────────────────────

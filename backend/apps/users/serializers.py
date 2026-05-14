@@ -78,12 +78,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         user = CustomUser(**validated_data)
         user.set_password(password)
-        # user.status = 'pending'
-        # TEMPORARY: bypass admin approval during development/demo.
-        user.status = 'active'
+        user.status = 'pending'
         user.save()
         return user
-        # User needed comprehension here
 
 
 class LoginSerializer(serializers.Serializer):
@@ -98,11 +95,11 @@ class LoginSerializer(serializers.Serializer):
                 'Invalid email or password.'
             )
 
-        # TEMPORARY: pending-status login gate is disabled while approval flow is bypassed.
-        # if user.status == 'pending':
-        #     raise serializers.ValidationError(
-        #         'Your account is awaiting admin approval. Please wait.'
-        #     )
+        
+        if user.status == 'pending':
+            raise serializers.ValidationError(
+                'Your account is awaiting admin approval. Please wait.'
+            )
 
         if user.status == 'rejected':
             raise serializers.ValidationError(
