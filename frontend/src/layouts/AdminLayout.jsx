@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import NotificationBell from '../components/NotificationBell';
 import '../styles/layout.css';
 
 export default function AdminLayout() {
@@ -27,7 +28,7 @@ return (
             <span className="nav-link-icon"></span> Dashboard
         </NavLink>
         <NavLink to="/admin/users" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span className="nav-link-icon"></span> Students
+            <span className="nav-link-icon"></span> Users
         </NavLink>
         <NavLink to="/admin/placements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <span className="nav-link-icon"></span> Placements
@@ -39,7 +40,7 @@ return (
 
         <div className="sidebar-footer">
         <NavLink to="/admin/placements/new" className="sidebar-cta-btn">
-            + Generate Report
+            + New Placement
         </NavLink>
         <button onClick={handleLogout} className="sidebar-footer-link">
             Logout
@@ -51,16 +52,17 @@ return (
     <main className="main-content">
         <header className="topbar">
         <h1 className="topbar-title">ILES Dashboard</h1>
-        <div className="topbar-right">
-            <div className="topbar-user">
-            <div>
-                <div className="topbar-user-name">{user?.full_name}</div>
-                <div className="topbar-user-role">Administrator</div>
-            </div>
-            <div className="topbar-avatar">
-                {user?.full_name?.charAt(0) || 'A'}
-            </div>
-            </div>
+        <div className="topbar-right">                                       
+            <NotificationBell />                                                                                                                                                     
+            <div className="topbar-user">                                                                                                                                            
+                <div>                                  
+                    <div className="topbar-user-name">{user?.full_name}</div>                                                                                                            
+                    <div className="topbar-user-role">Administrator</div>        
+                <div className="topbar-avatar">
+                {user?.full_name?.charAt(0) || 'A'}                                                                                                                                  
+                </div>                                   
+            </div> 
+        </div>                                                                                                                                                                  
         </div>
         </header>
         <div className="page-content">
