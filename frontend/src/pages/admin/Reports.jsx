@@ -47,21 +47,50 @@ export default function AdminReports() {
     loadPlacements();
   }, []);
 
+  // Derive statistical counts from nested backend object
+  const totalUsers = stats?.users
+    ? Object.values(stats.users).reduce((acc, curr) => acc + (curr.total || 0), 0)
+    : 0;
+
+  const activeStudents = stats?.users?.student?.active || 0;
+
+  const pendingUsers = stats?.users
+    ? Object.values(stats.users).reduce((acc, curr) => acc + (curr.pending || 0), 0)
+    : 0;
+
+  const totalPlacements = stats?.placements?.total || 0;
+  const activePlacements = stats?.placements?.active || 0;
+  const pendingPlacements = stats?.placements?.pending || 0;
+
+  const totalLogs = stats?.weekly_logs?.total || 0;
+  const submittedLogs = stats?.weekly_logs?.submitted || 0;
+  const approvedLogs = stats?.weekly_logs?.approved || 0;
+
+  const totalEvaluations = stats?.evaluations
+    ? (stats.evaluations.workplace_eval_submitted || 0) + (stats.evaluations.academic_eval_submitted || 0)
+    : 0;
+
+  // Filter student reports (only show placements where end date has passed)
+  const submittedPlacements = placements.filter(p => {
+    if (!p.end_date) return false;
+    return new Date() > new Date(p.end_date);
+  });
+
   // Export CSV for statistics
   const exportCSV = () => {
     if (!stats) return;
     const rows = [
       ['Metric', 'Value'],
-      ['Total Users', stats.total_users ?? '—'],
-      ['Active Students', stats.active_students ?? '—'],
-      ['Pending Users', stats.pending_users ?? '—'],
-      ['Total Placements', stats.total_placements ?? '—'],
-      ['Active Placements', stats.active_placements ?? '—'],
-      ['Pending Placements', stats.pending_placements ?? '—'],
-      ['Total Logs', stats.total_logs ?? '—'],
-      ['Submitted Logs', stats.submitted_logs ?? '—'],
-      ['Approved Logs', stats.approved_logs ?? '—'],
-      ['Total Evaluations', stats.total_evaluations ?? '—'],
+      ['Total Users', totalUsers],
+      ['Active Students', activeStudents],
+      ['Pending Users', pendingUsers],
+      ['Total Placements', totalPlacements],
+      ['Active Placements', activePlacements],
+      ['Pending Placements', pendingPlacements],
+      ['Total Logs', totalLogs],
+      ['Submitted Logs', submittedLogs],
+      ['Approved Logs', approvedLogs],
+      ['Total Evaluations', totalEvaluations],
     ];
     const csv = rows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -131,8 +160,11 @@ export default function AdminReports() {
       {activeTab === 'student-reports' ? (
         placementsLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><Spinner /></div>
-        ) : placements.length === 0 ? (
-          <EmptyState title="No Placements Found" description="There are no student placements registered in the system yet." />
+        ) : submittedPlacements.length === 0 ? (
+          <EmptyState
+            title="No Student Reports Submitted"
+            description="No end-of-internship reports have been uploaded yet. Students will be able to submit their final PDF reports once their placement periods end."
+          />
         ) : (
           <Card style={{ padding: 0, overflow: 'hidden' }}>
             <div style={{ overflowX: 'auto' }}>
@@ -147,41 +179,30 @@ export default function AdminReports() {
                   </tr>
                 </thead>
                 <tbody>
-                  {placements.map((p) => {
-                    const isSubmitted = new Date() > new Date(p.end_date);
-                    return (
-                      <tr key={p.id} style={{ borderBottom: '1px solid var(--outline-variant, #e5e6fe)' }}>
-                        <td style={tdStyle}>
-                          <div style={{ fontWeight: 600, color: 'var(--on-surface, #1A1714)' }}>{p.student?.full_name || 'Unassigned'}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--on-surface-variant, #5c5752)' }}>{p.student?.email || ''}</div>
-                        </td>
-                        <td style={tdStyle}>{p.company_name}</td>
-                        <td style={tdStyle}>{formatDate(p.end_date)}</td>
-                        <td style={tdStyle}>
-                          {isSubmitted ? (
-                            <span style={submittedBadgeStyle}>Submitted</span>
-                          ) : (
-                            <span style={ongoingBadgeStyle}>Internship Ongoing</span>
-                          )}
-                        </td>
-                        <td style={tdStyle}>
-                          {isSubmitted ? (
-                            <Btn
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => {
-                                toast.info(`Downloading final internship report for ${p.student?.full_name || 'student'}...`);
-                              }}
-                            >
-                              Download PDF
-                            </Btn>
-                          ) : (
-                            <span style={{ fontSize: '13px', color: 'var(--on-surface-variant, #5c5752)' }}>—</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {submittedPlacements.map((p) => (
+                    <tr key={p.id} style={{ borderBottom: '1px solid var(--outline-variant, #e5e6fe)' }}>
+                      <td style={tdStyle}>
+                        <div style={{ fontWeight: 600, color: 'var(--on-surface, #1A1714)' }}>{p.student?.full_name || 'Unassigned'}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--on-surface-variant, #5c5752)' }}>{p.student?.email || ''}</div>
+                      </td>
+                      <td style={tdStyle}>{p.company_name}</td>
+                      <td style={tdStyle}>{formatDate(p.end_date)}</td>
+                      <td style={tdStyle}>
+                        <span style={submittedBadgeStyle}>Submitted</span>
+                      </td>
+                      <td style={tdStyle}>
+                        <Btn
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {
+                            toast.info(`Downloading final internship report for ${p.student?.full_name || 'student'}...`);
+                          }}
+                        >
+                          Download PDF
+                        </Btn>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -194,16 +215,16 @@ export default function AdminReports() {
           <EmptyState title="No Stats" description="No report data available yet." />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
-            <StatCard label="Total Users" value={stats.total_users} />
-            <StatCard label="Active Students" value={stats.active_students} />
-            <StatCard label="Pending Users" value={stats.pending_users} color="#B5882A" />
-            <StatCard label="Total Placements" value={stats.total_placements} />
-            <StatCard label="Active Placements" value={stats.active_placements} color="#2D6A4F" />
-            <StatCard label="Pending Placements" value={stats.pending_placements} color="#B5882A" />
-            <StatCard label="Total Logs" value={stats.total_logs} />
-            <StatCard label="Submitted Logs" value={stats.submitted_logs} />
-            <StatCard label="Approved Logs" value={stats.approved_logs} color="#2D6A4F" />
-            <StatCard label="Total Evaluations" value={stats.total_evaluations} />
+            <StatCard label="Total Users" value={totalUsers} />
+            <StatCard label="Active Students" value={activeStudents} />
+            <StatCard label="Pending Users" value={pendingUsers} color="#B5882A" />
+            <StatCard label="Total Placements" value={totalPlacements} />
+            <StatCard label="Active Placements" value={activePlacements} color="#2D6A4F" />
+            <StatCard label="Pending Placements" value={pendingPlacements} color="#B5882A" />
+            <StatCard label="Total Logs" value={totalLogs} />
+            <StatCard label="Submitted Logs" value={submittedLogs} />
+            <StatCard label="Approved Logs" value={approvedLogs} color="#2D6A4F" />
+            <StatCard label="Total Evaluations" value={totalEvaluations} />
           </div>
         )
       )}
@@ -244,15 +265,6 @@ const tdStyle = {
 const submittedBadgeStyle = {
   background: '#DEF7EC',
   color: '#03543F',
-  padding: '4px 8px',
-  borderRadius: '6px',
-  fontSize: '12px',
-  fontWeight: 600
-};
-
-const ongoingBadgeStyle = {
-  background: '#FEF08A',
-  color: '#713F12',
   padding: '4px 8px',
   borderRadius: '6px',
   fontSize: '12px',
