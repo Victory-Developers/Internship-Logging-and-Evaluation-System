@@ -252,8 +252,8 @@ def _build_scores_overview(placements_qs):
             'workplace_avg':        wp_avg,
             'academic_avg':         ac_avg,
             'combined_avg':         combined,
-            'workplace_evaluation': wp_eval,
-            'academic_evaluation':  ac_eval,
+            'workplace_evaluation': WorkplaceEvaluationSerializer(wp_eval).data if wp_eval else None,
+            'academic_evaluation':  AcademicEvaluationSerializer(ac_eval).data if ac_eval else None,
         })
     return results
 
