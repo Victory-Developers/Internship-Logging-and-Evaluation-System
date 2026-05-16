@@ -60,6 +60,7 @@ PLACEMENT_DETAIL: (id) => `/placements/${id}/`,
 
 // Log detail
 MY_LOG_DETAIL: (id) => `/logs/my/${id}/`,
+LOG_DETAIL: (id) => `/logs/${id}/`,
 MY_LOG_SUBMIT: (id) => `/logs/my/${id}/submit/`,
 LOG_COMMENTS: (id) => `/logs/${id}/comments/`,
 SUPERVISOR_LOG_REVIEW: (id) => `/logs/supervisor/${id}/review/`,

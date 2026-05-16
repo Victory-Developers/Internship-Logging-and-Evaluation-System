@@ -9,6 +9,7 @@ from .views import (
     AcademicLogListView,
     AdminLogListView,
     LogCommentCreateView,
+    LogDetailView,
 )
 
 urlpatterns = [
@@ -28,6 +29,9 @@ urlpatterns = [
     # Admin
     path('admin/',                           AdminLogListView.as_view(),         name='admin-log-list'),
 
-    # Comments (workplace + academic supervisor
+    # General Detail View (for supervisors/admin/student)
+    path('<int:pk>/',                        LogDetailView.as_view(),            name='log-detail'),
+
+    # Comments (workplace + academic supervisor)
     path('<int:pk>/comments/',               LogCommentCreateView.as_view(),     name='log-comment-create'),
 ]

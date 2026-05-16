@@ -17,7 +17,7 @@ export default function SupervisorReviewLog() {
   const [posting, setPosting] = useState(false);
 
   const fetchLog = () => {
-    api.get(`${ENDPOINTS.ACADEMIC_LOGS}${id}/`)
+    api.get(ENDPOINTS.LOG_DETAIL(id))
       .then(res => setLog(res.data))
       .catch(() => {});
   };
