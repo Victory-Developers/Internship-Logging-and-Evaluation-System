@@ -42,7 +42,39 @@ export default function WorkplaceDashboard() {
   }, []);
 
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><Spinner /></div>;
+    return (
+      <div>
+        <div className="skeleton-box" style={{ height: '32px', width: '200px', marginBottom: '1.5rem' }} />
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          {[1, 2, 3].map(i => (
+            <Card key={i}>
+              <div className="skeleton-box" style={{ height: '14px', width: '70%', marginBottom: '8px' }} />
+              <div className="skeleton-box" style={{ height: '28px', width: '30%' }} />
+            </Card>
+          ))}
+        </div>
+
+        <Card>
+          <div className="skeleton-box" style={{ height: '20px', width: '240px', marginBottom: '1rem' }} />
+          {[1, 2, 3].map(i => (
+            <div key={i} style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '10px 0', borderBottom: '1px solid #F0EDE8',
+            }}>
+              <div>
+                <div className="skeleton-box" style={{ height: '16px', width: '120px', marginBottom: '6px' }} />
+                <div className="skeleton-box" style={{ height: '12px', width: '180px' }} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div className="skeleton-box" style={{ height: '20px', width: '60px', borderRadius: 20 }} />
+                <div className="skeleton-box" style={{ height: '28px', width: '60px', borderRadius: 8 }} />
+              </div>
+            </div>
+          ))}
+        </Card>
+      </div>
+    );
   }
 
   return (

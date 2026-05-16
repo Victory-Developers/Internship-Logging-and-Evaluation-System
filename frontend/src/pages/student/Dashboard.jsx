@@ -499,7 +499,11 @@ export default function StudentDashboard() {
                   lineHeight: 1,
                 }}
               >
-                {s.value}
+                {loading ? (
+                  <div className="skeleton-box" style={{ height: '24px', width: '32px', marginTop: '4px' }} />
+                ) : (
+                  s.value
+                )}
               </div>
             </div>
           ))}
