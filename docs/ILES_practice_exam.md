@@ -866,3 +866,396 @@ Django handles authentication, persistence and business logic (state transitions
 5. After 30 minutes on one question, **move on**. Come back if time allows.
 6. Last 10 minutes: re-read your code. Check `==` vs `=`, missing colons, missing brackets, `useState` vs `useEffect`, `key={...}` in maps.
 7. If you have time, write `# explanation` comments — Q5 last year demanded them; offering them unprompted impresses the marker.
+
+---
+
+## Question 11 — SDLC + Requirements engineering **(20 Marks)** *(Lecture 1 + 2)*
+
+A development team is starting work on ILES. Before writing any code, the team must clarify *what* the system must do, *who* uses it, and *how* the build will proceed.
+
+### a) List the six phases of the Software Development Life Cycle (SDLC) and give a one-line ILES-specific example of what happens in each phase. **(6 Marks)**
+
+### b) Write **two user stories** for the **Workplace Supervisor** role in the prescribed format `As a [role], I want to [action], so that [benefit]`. **(4 Marks)**
+
+### c) For *each* of the two user stories you wrote, derive **one functional requirement** in the form "The system shall …". **(4 Marks)**
+
+### d) Distinguish between functional and non-functional requirements, and give **three** non-functional requirements relevant to ILES (one of which must be measurable). **(6 Marks)**
+
+---
+
+### Model answer — Q11
+
+**a)** SDLC phases applied to ILES:
+
+| Phase | ILES example |
+|---|---|
+| **Planning** | Decide scope (only Makerere internships), tech stack (Django + React + Postgres), team roles. |
+| **Analysis** | Collect user stories from each of the four roles, identify entities and workflow states. |
+| **Design** | Draw the ERD (CustomUser–Placement–WeeklyLog–Evaluation), define API endpoints, sketch dashboards. |
+| **Implementation** | Code Django models, DRF serializers/views, React forms and dashboards. |
+| **Testing** | Unit tests for state transitions and scoring; integration tests for the auth flow. |
+| **Deployment** | Push to Heroku with gunicorn + Postgres add-on, set env vars, run `collectstatic` and `migrate`. |
+
+**b)** Two workplace-supervisor stories:
+
+1. As a workplace supervisor, I want to approve or reject submitted weekly logs so that only valid work is recorded.
+2. As a workplace supervisor, I want to comment on a student's weekly log so that they can improve their reporting.
+
+**c)** Functional requirements:
+
+1. The system shall allow a workplace supervisor to update the status of a `WeeklyLog` from `Submitted` to `Reviewed` or `Rejected`.
+2. The system shall allow a workplace supervisor to attach a free-text comment to a weekly log; the comment shall be stored with a timestamp and the author's ID.
+
+**d)** Functional requirements describe **what the system does** (verb-led, "shall …"); non-functional requirements describe **how it behaves** (often measurable adjectives — performance, security, scalability).
+
+Three NFRs for ILES (third is measurable):
+
+1. **Security** — only assigned supervisors can read or modify a student's logs.
+2. **Auditability** — every status change must be recorded with the user who made it and the timestamp.
+3. **Performance** — the student dashboard must load within 3 seconds with 100 logs in the database (measurable).
+
+---
+
+## Question 12 — System architecture + request flow **(20 Marks)** *(Lecture 3)*
+
+### a) Using a labelled diagram, describe the four-tier architecture of ILES and explain the responsibility of each tier. **(6 Marks)**
+
+### b) List the **five steps** that occur when a student submits a weekly log, from the moment they click "Submit" in React to the moment the dashboard updates. **(6 Marks)**
+
+### c) Take the user story *"As a student, I want to submit a weekly log so that my supervisor can review it"* and extract: (i) the **entities** implied by the story, (ii) the **attributes** the WeeklyLog entity should have to support it, (iii) the **relationships** between the entities. **(8 Marks)**
+
+---
+
+### Model answer — Q12
+
+**a)** Four-tier architecture:
+
+```
++-------------------+        +----------------------+        +-----------------+        +-------------+
+|  React Frontend   |  HTTP  |  Django REST API     |  ORM   |  Django Backend |  SQL   |  Postgres   |
+|  (forms, lists,   | <----> |  (URLs, views,       | <----> |  (models,       | <----> |  Database   |
+|   dashboards)     |  JSON  |   serializers)       |        |   business      |        |             |
+|                   |        |                      |        |   logic, signals|        |             |
++-------------------+        +----------------------+        +-----------------+        +-------------+
+```
+
+- **React Frontend** owns the UI: rendering, controlled forms, client-side validation, calling `fetch`.
+- **Django REST API** exposes resources by URL and verb (`GET /api/logs/`); serializers map between JSON and model instances.
+- **Django Backend** is the business-logic centre: models, state-transition rules, signals, weighted-score computation.
+- **PostgreSQL** persists all data. Django talks to it through the ORM.
+
+**b)** Five-step request flow:
+
+1. **React form submission** — `e.preventDefault()`, `fetch('/api/logs/', { method: 'POST', body: JSON.stringify(formData) })`.
+2. **API request** — HTTP POST hits the URL routed in `urls.py` to the matching view.
+3. **Serializer validation** — DRF's `WeeklyLogSerializer(data=request.data).is_valid()` runs field validators, `validate_<field>`, and cross-field `validate()`.
+4. **Database storage** — `serializer.save()` triggers `model.save()` (which can run state-transition checks) and writes the row via the ORM.
+5. **JSON response** — Django returns `Response(serializer.data, status=201)`; React reads it, calls `setLogs(...)`, and the dashboard re-renders.
+
+**c)**
+
+- (i) **Entities** (nouns in the story): `Student` (i.e. `CustomUser` with role=Student), `WeeklyLog`, `Supervisor` (`CustomUser` with role=WorkplaceSupervisor or AcademicSupervisor). An implicit fourth entity, `InternshipPlacement`, ties the student to the supervisor.
+- (ii) **Attributes** for `WeeklyLog`: `id` (PK), `week_number`, `activities` (text), `hours` (integer), `status` (choice from Draft/Submitted/Reviewed/Approved/Rejected), `submitted_at` (auto timestamp), `created_at`, `updated_at`.
+- (iii) **Relationships**:
+  - `WeeklyLog` → `InternshipPlacement`: many-to-one (`ForeignKey`, `related_name='logs'`).
+  - `InternshipPlacement` → `CustomUser` (student): many-to-one.
+  - `InternshipPlacement` → `CustomUser` (supervisor): many-to-one (a supervisor may oversee many placements).
+  - Therefore `WeeklyLog → Student` is a **transitive many-to-one** via `placement`, which is why the standard query is `WeeklyLog.objects.filter(placement__student=request.user)`.
+
+---
+
+## Question 13 — Authentication & Authorisation **(20 Marks)** *(Lecture 4)*
+
+ILES requires that only authenticated users access the system and that each role sees only what their permissions allow.
+
+### a) Distinguish between **authentication** and **authorisation**, and give one example of each in ILES. **(4 Marks)**
+
+### b) Briefly describe four **authorisation mechanisms** (RBAC, ABAC, DAC, MAC) and state which one ILES uses and why. **(6 Marks)**
+
+### c) The view below restricts approving a weekly log to users in the `AcademicSupervisor` group. Fill in the missing lines 3, 5, and 8 so the view (i) requires the user to be logged in, (ii) requires the `logs.can_approve_log` permission, and (iii) verifies the user is in the right group before approving. **(6 Marks)**
+
+```
+1 | from django.contrib.auth.decorators import _______, _______
+2 | from django.shortcuts import get_object_or_404, redirect
+3 | _______                                        # decorator: must be logged in
+4 | _______                                        # decorator: must have logs.can_approve_log permission
+5 | def approve_log(request, pk):
+6 |   log = get_object_or_404(WeeklyLog, pk=pk)
+7 |   if not _______:                              # group check
+8 |     return redirect('forbidden')
+9 |   log.status = 'Approved'
+10|  log.save()
+11|  return redirect('dashboard')
+```
+
+### d) Write the React Router setup so a `/admin` route is **only** reachable by users whose role (stored in `localStorage`) equals `"admin"`, redirecting everyone else to `/login`. Use a `ProtectedRoute` wrapper. **(4 Marks)**
+
+---
+
+### Model answer — Q13
+
+**a)** **Authentication** verifies *who* a user is (e.g. a student logs in with username + password and Django checks the hashed credential). **Authorisation** decides *what* they can do once known (e.g. only users in the `AcademicSupervisor` group can call the "Approve log" endpoint).
+
+**b)**
+
+- **RBAC** — Role-Based Access Control. Permissions attach to roles (Student, Supervisor, Admin); users inherit role permissions. Used by ILES.
+- **ABAC** — Attribute-Based Access Control. Permissions depend on attributes (department, time of day, device).
+- **DAC** — Discretionary Access Control. The resource owner chooses who else may access it.
+- **MAC** — Mandatory Access Control. Strict, centrally-enforced policies (used in military/government systems).
+
+ILES uses **RBAC** because permissions are stable per role and don't depend on context like time or location, which makes the rules easy to enforce uniformly across views, dashboards, and the API.
+
+**c)**
+
+```python
+1 | from django.contrib.auth.decorators import login_required, permission_required
+2 | from django.shortcuts import get_object_or_404, redirect
+3 | @login_required                                                  # logged-in only
+4 | @permission_required('logs.can_approve_log', raise_exception=True)  # permission check
+5 | def approve_log(request, pk):
+6 |   log = get_object_or_404(WeeklyLog, pk=pk)
+7 |   if not request.user.groups.filter(name='AcademicSupervisor').exists():
+8 |     return redirect('forbidden')
+9 |   log.status = 'Approved'
+10|  log.save()
+11|  return redirect('dashboard')
+```
+
+**d)**
+
+```jsx
+// ProtectedRoute.jsx
+import { Navigate } from 'react-router-dom';
+function ProtectedRoute({ allowedRole, children }) {
+  const role = localStorage.getItem('role');
+  if (!role) return <Navigate to="/login" replace />;
+  if (allowedRole && role !== allowedRole)
+    return <Navigate to="/login" replace />;
+  return children;
+}
+
+// App.jsx
+<Routes>
+  <Route path="/login" element={<Login />} />
+  <Route path="/admin" element={
+    <ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>
+  }/>
+</Routes>
+```
+
+---
+
+## Question 14 — Email, SMS, and Toast notifications **(20 Marks)** *(Lecture 7)*
+
+ILES notifies students and supervisors when a weekly log changes state. The backend sends emails (and optionally SMS via Twilio); the frontend shows toasts.
+
+### a) Briefly explain why notifications matter in ILES and list the **three** types of notification covered in lecture 7. **(4 Marks)**
+
+### b) The Django `settings.py` snippet below is meant to configure Gmail SMTP. Lines 2, 4, and 6 are wrong or missing. Fix them. **(6 Marks)**
+
+```
+1 | EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+2 | EMAIL_HOST = 'gmail.com'
+3 | EMAIL_PORT = 587
+4 | EMAIL_USE_TLS = False
+5 | EMAIL_HOST_USER = 'iles-noreply@gmail.com'
+6 | EMAIL_HOST_PASSWORD = 'mygmailpassword'
+```
+
+### c) Complete the Twilio helper function. Lines 4, 6, and 8 are missing. **(6 Marks)**
+
+```
+1 | from twilio.rest import Client
+2 | from django.conf import settings
+3 | def send_sms(to_number, body):
+4 |   client = _______
+5 |   message = client.messages.create(
+6 |     _______=body,
+7 |     from_=settings.TWILIO_PHONE_NUMBER,
+8 |     _______=to_number
+9 |   )
+10|  return message.sid
+```
+
+### d) The React component below should show a success toast on save. Fix lines 1, 5, and 7. **(4 Marks)**
+
+```
+1 | import Toastify from 'react-toastify';
+2 | import 'react-toastify/dist/ReactToastify.css';
+3 |
+4 | function SaveButton() {
+5 |   const onSave = () {
+6 |     fetch('/api/logs/1/', { method: 'PATCH' })
+7 |       .then(res => Toastify.success("Saved!"));
+8 |   };
+9 |   return <button onClick={onSave}>Save</button>;
+10|}
+```
+
+---
+
+### Model answer — Q14
+
+**a)** Notifications keep users informed of state changes that they would otherwise have to poll for — e.g. a student learning that their log was approved, a supervisor learning that a new log is awaiting review. This improves transparency, reduces support load, and tightens the workflow loop. The three types covered are **email notifications**, **SMS notifications**, and **in-app/visual (toast) notifications**.
+
+**b)**
+
+```python
+1 | EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+2 | EMAIL_HOST = 'smtp.gmail.com'                       # smtp.gmail.com, not gmail.com
+3 | EMAIL_PORT = 587
+4 | EMAIL_USE_TLS = True                                # TLS must be True for port 587
+5 | EMAIL_HOST_USER = 'iles-noreply@gmail.com'
+6 | EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')   # never hardcode credentials
+```
+
+**c)**
+
+```python
+4 |   client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+6 |     body=body,
+8 |     to=to_number
+```
+
+Complete:
+
+```python
+def send_sms(to_number, body):
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    message = client.messages.create(
+        body=body,
+        from_=settings.TWILIO_PHONE_NUMBER,
+        to=to_number,
+    )
+    return message.sid
+```
+
+**d)**
+
+```jsx
+1 | import { toast } from 'react-toastify';                       // named import { toast }
+...
+5 |   const onSave = () => {                                       // arrow function needs =>
+...
+7 |       .then(res => toast.success("Saved!"));                   // lowercase toast, not Toastify
+```
+
+You also need `<ToastContainer />` mounted once in `App` for any of this to render — credit if mentioned.
+
+---
+
+## Question 15 — Admin features: filtering + assignment **(20 Marks)** *(Lecture 6)*
+
+The Internship Administrator dashboard lists all weekly logs across the institution. The admin must be able to filter by status and reassign a log's reviewer.
+
+### a) Explain why filtering must happen **on the backend** with Django QuerySets rather than purely on the frontend. **(4 Marks)**
+
+### b) Complete the DRF view below so that `GET /api/admin/logs/` accepts a `?status=Submitted` query parameter and a `?department=<id>` query parameter, applying each only if present. Fill lines 4, 6, and 8. **(8 Marks)**
+
+```
+1 | from rest_framework.views import APIView
+2 | from rest_framework.response import Response
+3 | from .models import WeeklyLog
+4 | from .serializers import _______
+5 | class AdminLogListView(APIView):
+6 |   permission_classes = [_______]
+7 |   def get(self, request):
+8 |     qs = WeeklyLog.objects.________
+9 |     status_param = request.query_params.get('status')
+10|    if status_param:
+11|      qs = qs.filter(status=status_param)
+12|    dept_param = request.query_params.get('department')
+13|    if dept_param:
+14|      qs = qs.filter(placement__student__department_id=dept_param)
+15|    serializer = WeeklyLogSerializer(qs, many=True)
+16|    return Response(serializer.data)
+```
+
+### c) Write a small Django REST view that handles `PATCH /api/logs/<id>/assign/` and sets the log's `assigned_to` field to the user ID supplied in the request body. Use any reasonable view style and include a permission check that only the `Admin` group can call it. **(8 Marks)**
+
+---
+
+### Model answer — Q15
+
+**a)** Frontend filtering only works if you've already shipped every row to the browser, which is impossibly expensive once the institution has thousands of logs. Backend filtering uses indexed SQL `WHERE` clauses through Django QuerySets, so only the needed rows cross the network. It also enforces security: the backend can hide rows the user is not allowed to see, whereas a frontend filter could be bypassed by anyone reading the JSON in DevTools.
+
+**b)**
+
+```python
+4 | from .serializers import WeeklyLogSerializer
+6 |   permission_classes = [IsAdminUser]                # or a custom IsAdmin group permission
+8 |     qs = WeeklyLog.objects.all()                    # start with everything; filters narrow it
+```
+
+Complete view:
+
+```python
+from rest_framework.permissions import IsAdminUser
+
+class AdminLogListView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        qs = WeeklyLog.objects.all()
+        status_param = request.query_params.get('status')
+        if status_param:
+            qs = qs.filter(status=status_param)
+        dept_param = request.query_params.get('department')
+        if dept_param:
+            qs = qs.filter(placement__student__department_id=dept_param)
+        serializer = WeeklyLogSerializer(qs, many=True)
+        return Response(serializer.data)
+```
+
+**c)**
+
+```python
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, BasePermission
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class IsAdminGroup(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and \
+               request.user.groups.filter(name='Admin').exists()
+
+class AssignLogView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminGroup]
+
+    def patch(self, request, pk):
+        log = get_object_or_404(WeeklyLog, pk=pk)
+        assignee_id = request.data.get('assigned_to')
+        if not assignee_id:
+            return Response(
+                {'detail': 'assigned_to is required.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        log.assigned_to = get_object_or_404(User, pk=assignee_id)
+        log.save()
+        return Response(WeeklyLogSerializer(log).data)
+```
+
+URL: `path('api/logs/<int:pk>/assign/', AssignLogView.as_view(), name='log-assign')`.
+
+---
+
+## Appendix D — Chapter-to-question coverage map
+
+Use this when revising so you don't accidentally skip a lecture.
+
+| Lecture | Topic | Practice questions |
+|---|---|---|
+| 1. Intro / SDLC | SDLC, workflow states, scoring overview | Q9, Q10, Q11 |
+| 2. Requirements | User stories, FR/NFR, entities | Q11, Q12 |
+| 3. System Design | Architecture, ERD, APIs, serializers | Q1, Q2, Q5, Q7, Q12 |
+| 4. Authentication / RBAC | Authn vs Authz, groups, decorators, React Router | Q13 |
+| 5. Student Features | Issue form, validation, dashboard | Q2, Q3, Q5, Q7 |
+| 6. Admin Features | Filtering, assignment, PATCH | Q15 |
+| 7. Notifications + Workflow | Email, SMS, signals, Toastify | Q4, Q14 |
+| Cross-cutting (assured) | Heroku deployment | Q6 |
+| Cross-cutting (assured) | Testing | Q8 |
