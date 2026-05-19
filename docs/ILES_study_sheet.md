@@ -25,16 +25,21 @@ Four roles: **Student Intern**, **Workplace Supervisor**, **Academic Supervisor*
 
 Core entities (use these names in answers unless the question gives different ones):
 
-- `CustomUser` (extends `AbstractUser`) — `role`, `department`
+- `CustomUser` (extends `AbstractUser`) — `role`, `department`, `staff_number` (optional), `student_number` (optional)
 - `Department`
-- `InternshipPlacement` — student, company, supervisor, start_date, end_date
-- `WeeklyLog` — student, placement, week_number, activities, hours, status
+- `InternshipPlacement` — student, company_name, supervisor, start_date, end_date
+- `WeeklyLog` — placement, week_number, activities, hours, status
 - `EvaluationCriteria` — name, weight (e.g. 0.4 for 40%)
 - `Evaluation` — student, criteria, score, evaluator
 
-Workflow states for `WeeklyLog`: **Draft -> Submitted -> Reviewed -> Approved** (rejection sends it back to Draft).
+Workflow states for `WeeklyLog` (from Dr. Wakholi's slide 2): **Draft -> Submitted -> Reviewed -> Approved**, with **Rejected** as a fifth state. Valid transitions per slide 1:
 
-Weighted scoring: total = (workplace * 0.4) + (academic * 0.3) + (logbook * 0.3) — example only, the question will give you the exact weights.
+- Draft -> Submitted
+- Submitted -> Reviewed
+- Reviewed -> Approved
+- **Reviewed -> Draft** (revision arrow — this is the one most students get wrong)
+
+Weighted scoring (Dr's example on slide 1): **Technical 40% + Communication 30% + Professionalism 30%**, so `Final Score = T*0.4 + C*0.3 + P*0.3`. The exam may use different field names (workplace/academic/logbook) — same arithmetic.
 
 ---
 
@@ -87,6 +92,7 @@ class WeeklyLog(models.Model):
         ('Submitted', 'Submitted'),
         ('Reviewed', 'Reviewed'),
         ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
     ]
     placement = models.ForeignKey(
         InternshipPlacement, on_delete=models.CASCADE, related_name='logs'
@@ -741,9 +747,10 @@ class Evaluation(models.Model):
 ```python
 ALLOWED_TRANSITIONS = {
     'Draft':     ['Submitted'],
-    'Submitted': ['Reviewed', 'Draft'],
-    'Reviewed':  ['Approved', 'Submitted'],
+    'Submitted': ['Reviewed', 'Rejected'],
+    'Reviewed':  ['Approved', 'Draft'],     # Reviewed -> Draft is the revision arrow
     'Approved':  [],
+    'Rejected':  ['Draft'],                 # rejected -> back to draft for fix-up
 }
 
 class WeeklyLog(models.Model):
@@ -839,3 +846,339 @@ Spend an hour today doing this with a pen and a blank sheet:
 10. Write a 4-mark concept paragraph on REST APIs and another on input validation.
 
 If any of those 10 things take longer than 6 minutes to write, **redo only that one** until it does.
+
+---
+
+## 16. Authentication & Authorisation cheat sheet (Lecture 4)
+
+This is the lecture with the most slides (28). Expect at least one 4-mark concept Q and one short code Q.
+
+### Concept vocabulary
+
+- **Authentication** = "Who are you?" — verifying identity (username/password, biometric, OTP).
+- **Authorisation** = "What can you do?" — deciding what an authenticated user is allowed to access.
+- Both are required. Authentication without authorisation = everyone can do anything. Authorisation without authentication = impossible (you don't know who to authorise).
+
+### Types of authentication (memorise these names)
+
+| Type | Meaning |
+|---|---|
+| **SFA** | Single-factor — one credential (just password). |
+| **2FA** | Two-factor — password + something else (SMS code, authenticator app). |
+| **MFA** | Multi-factor — password + token + biometric, etc. |
+| **Passwordless** | Magic link, OTP, biometric only. |
+
+### Common authentication methods
+
+- Username + password
+- Biometric (Fingerprint, Face ID)
+- One-Time Passwords (OTP)
+- Social Authentication (Google, Facebook login)
+
+### Authorisation mechanisms (4-mark Q bait)
+
+| Acronym | Stands for | Meaning |
+|---|---|---|
+| **RBAC** | Role-Based Access Control | Permissions assigned to roles (Admin, Student); users inherit role permissions. **This is what ILES uses.** |
+| **ABAC** | Attribute-Based Access Control | Permissions depend on attributes (location, device, time of day). |
+| **DAC** | Discretionary Access Control | The resource owner decides who can access it. |
+| **MAC** | Mandatory Access Control | Strict, centrally enforced policy (military / government). |
+
+One-line "best fit" answer if asked: *ILES uses **RBAC** because permissions are stable per role (only supervisors review logs, only admins assign placements) and roles don't depend on context like time or location.*
+
+### Django authentication (vanilla, non-DRF)
+
+```python
+# urls.py
+from django.contrib.auth.views import LoginView, LogoutView
+urlpatterns = [
+    path('login/',  LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+]
+
+# views.py
+from django.contrib.auth.decorators import login_required, permission_required
+
+@login_required
+def my_view(request):
+    return ...
+
+@permission_required('logs.can_approve_weeklylog', raise_exception=True)
+def approve_view(request, pk):
+    ...
+```
+
+### Django Groups & Permissions
+
+```python
+from django.contrib.auth.models import Group, Permission
+
+# Create groups (run in a migration or setUp)
+student_group, _    = Group.objects.get_or_create(name='Student')
+supervisor_group, _ = Group.objects.get_or_create(name='WorkplaceSupervisor')
+
+# Attach a permission to a group
+perm = Permission.objects.get(codename='change_weeklylog')
+supervisor_group.permissions.add(perm)
+
+# Assign a user to a group
+user.groups.add(student_group)
+
+# Check at runtime
+user.has_perm('logs.change_weeklylog')
+user.groups.filter(name='WorkplaceSupervisor').exists()
+```
+
+Define custom permissions in `Meta`:
+
+```python
+class WeeklyLog(models.Model):
+    # ... fields ...
+    class Meta:
+        permissions = [
+            ('can_approve_log',  'Can approve a weekly log'),
+            ('can_review_log',   'Can review a weekly log'),
+        ]
+```
+
+### DRF custom permission class
+
+```python
+from rest_framework.permissions import BasePermission
+
+class IsStudent(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and \
+               request.user.groups.filter(name='Student').exists()
+```
+
+### React Router protected route (role-based dashboard)
+
+```jsx
+// ProtectedRoute.jsx
+import { Navigate } from 'react-router-dom';
+
+function ProtectedRoute({ children, allowedRole }) {
+  const role = localStorage.getItem('role');           // saved at login
+  if (!role) return <Navigate to="/login" replace />;
+  if (allowedRole && role !== allowedRole)
+    return <Navigate to="/" replace />;
+  return children;
+}
+
+// App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/student" element={
+          <ProtectedRoute allowedRole="student"><StudentDashboard/></ProtectedRoute>
+        }/>
+        <Route path="/admin" element={
+          <ProtectedRoute allowedRole="admin"><AdminDashboard/></ProtectedRoute>
+        }/>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+After login, store the role: `localStorage.setItem('role', data.role)`.
+
+### Best practices (cite verbatim if asked)
+
+- Strong password policies (length, complexity).
+- Implement **MFA** for sensitive roles.
+- Use secure hashing (**bcrypt** or **Argon2**) — Django uses PBKDF2 by default, which is acceptable.
+- Session timeouts + account lockout after N failed attempts.
+- **Principle of Least Privilege (PoLP)**: assign only the permissions a role truly needs.
+- Regularly audit & review permissions.
+
+---
+
+## 17. Notifications cheat sheet — SMTP + Twilio + Toastify (Lecture 7)
+
+### SMTP email configuration in `settings.py`
+
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')   # app password, not real password
+DEFAULT_FROM_EMAIL = 'ILES <noreply@iles.mak.ac.ug>'
+```
+
+### Sending email (already in §7 but reproduced for completeness)
+
+```python
+from django.core.mail import send_mail
+
+send_mail(
+    subject="Log Approved",
+    message="Your weekly log has been approved.",
+    from_email="noreply@iles.mak.ac.ug",
+    recipient_list=[user.email],     # MUST be a list
+    fail_silently=False,
+)
+```
+
+### Twilio SMS
+
+`pip install twilio` then in `settings.py`:
+
+```python
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN  = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')   # the FROM number Twilio gives you
+```
+
+Helper function:
+
+```python
+from twilio.rest import Client
+from django.conf import settings
+
+def send_sms(to_number: str, body: str):
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    message = client.messages.create(
+        body=body,
+        from_=settings.TWILIO_PHONE_NUMBER,
+        to=to_number,
+    )
+    return message.sid
+```
+
+Trigger from a signal:
+
+```python
+@receiver(post_save, sender=WeeklyLog)
+def sms_on_approval(sender, instance, created, **kwargs):
+    if not created and instance.status == 'Approved':
+        send_sms(
+            instance.placement.student.phone_number,
+            f"Week {instance.week_number} log approved."
+        )
+```
+
+**Common bugs:**
+
+- `from_` keyword has a trailing underscore (`from` is a Python keyword).
+- `to=` must be a single E.164-formatted string (e.g. `+256700123456`), not a list.
+- Forgetting to read SID/token from env → credentials leak in repo.
+
+### React Toastify
+
+`npm install react-toastify`
+
+```jsx
+// App.jsx — render the container once at the app root
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function App() {
+  return (
+    <>
+      <Routes>{/* ... */}</Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
+    </>
+  );
+}
+
+// Anywhere in a component:
+toast.success("Log submitted!");
+toast.error("Failed to submit.");
+toast.info("Pending review.");
+```
+
+Trigger after an API response:
+
+```jsx
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const res = await fetch('/api/logs/', { /* ... */ });
+  if (res.ok) toast.success("Log submitted!");
+  else        toast.error("Submission failed.");
+};
+```
+
+---
+
+## 18. SDLC + Requirements engineering (Lectures 1–2)
+
+### SDLC phases — applied to ILES (memorise the mapping)
+
+| Phase | What you do in ILES |
+|---|---|
+| **Planning** | Identify the four roles, scope (only Makerere internships), decide tech stack (Django + React + Postgres). |
+| **Analysis** | Gather requirements: user stories, workflow states (Draft→Submitted→Reviewed→Approved/Rejected), entities. |
+| **Design** | Draw the ERD (CustomUser–Placement–WeeklyLog–Evaluation), define API contract, sketch dashboards. |
+| **Implementation** | Code Django models + serializers + APIViews; build React forms + dashboards. |
+| **Testing** | Write unit tests (model save, state transitions, RBAC) + integration tests (API + auth). |
+| **Deployment** | Deploy to Heroku: gunicorn, Postgres add-on, env vars, `collectstatic`. |
+
+If asked for a 4-mark answer: list the six phases and give the one-line ILES example for each.
+
+### Functional vs non-functional requirements
+
+- **Functional** = what the system *does*. Verb-led. *"The system shall allow a student to submit a weekly log."*
+- **Non-functional** = how the system *behaves*. Adjective-led, often measurable.
+
+Slide-2 examples of non-functional for ILES:
+
+| Category | Example |
+|---|---|
+| Security | Only assigned supervisors can review a student's logs. |
+| Integrity | A student cannot have overlapping internship placements. |
+| Performance | Dashboards load within 3 seconds. |
+| Auditability | All review actions must be logged. |
+| Scalability | System must support at least 500 concurrent users. |
+| Reliability | No data loss on submission. |
+
+### User stories — Dr's format
+
+> **As a [role], I want to [action], so that [benefit].**
+
+ILES examples, one per role, that you can write straight from memory:
+
+1. *As a student, I want to submit weekly logs so that my supervisor can review my work.*
+2. *As a workplace supervisor, I want to approve or reject weekly logs so that only valid work is recorded.*
+3. *As an academic supervisor, I want to evaluate students using weighted criteria so that grading is standardised.*
+4. *As an internship administrator, I want to assign supervisors to students so that every student is monitored.*
+
+### Converting a user story → functional requirement
+
+User story → identify the verb → state it as a "system shall" obligation.
+
+- Story: *As a student, I want to submit a weekly log.*
+- Requirement(s):
+  - The system shall allow a student to create a weekly log.
+  - The system shall allow editing while `status = Draft`.
+  - The system shall prevent editing when `status = Approved`.
+  - The system shall timestamp every submission.
+  - The system shall reject submissions past the deadline.
+
+This 1→many expansion is the easiest 6-mark answer in the paper.
+
+### Entities — from user stories
+
+The slide-3 trick: identify the **nouns** in your user stories. Those nouns become your entities.
+
+> "As a student, I want to submit a weekly log so that my supervisor can review it."
+> Nouns: **student, weekly log, supervisor.** → `CustomUser`, `WeeklyLog`, plus a supervisor relationship.
+
+Then for each entity: list attributes, then list relationships (one-to-many, many-to-many).
+
+### Five-step request flow (slide 3, easy 5-mark fill-in)
+
+1. **React form submission** — user clicks Submit; React calls `e.preventDefault()` and `fetch(...)`.
+2. **API request** — HTTP POST hits the Django URL with JSON body.
+3. **Serializer validation** — DRF serializer validates fields; rejects with 400 if invalid.
+4. **Database storage** — `serializer.save()` writes the row.
+5. **JSON response** — Django returns `Response(data, status=201)`; React reads it and updates state.
+
+Draw this as a simple boxes-and-arrows diagram if asked.
