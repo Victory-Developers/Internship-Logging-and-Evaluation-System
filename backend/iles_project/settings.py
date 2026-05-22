@@ -152,3 +152,13 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 #RESEND_API_KEY = os.getenv('RESEND_API_KEY')
+
+# Use in-memory SQLite database for testing to run tests offline and fast
+import sys
+if 'test' in sys.argv or any('pytest' in arg for arg in sys.argv):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
