@@ -7,7 +7,7 @@ from apps.evaluations.models import WorkplaceEvaluation, AcademicEvaluation
 from datetime import date
 
 @pytest.fixture
-def eval_setup():
+def eval_setup(db):
     # Setup users
     student = CustomUser.objects.create_user(
         email='student@example.com', password='password123', full_name='Student User', role='student', status='active'

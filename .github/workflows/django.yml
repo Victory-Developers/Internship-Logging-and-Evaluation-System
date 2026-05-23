@@ -13,6 +13,7 @@ jobs:
     env:
       DJANGO_SETTINGS_MODULE: iles_project.settings
       SECRET_KEY: ci-test-secret-key-not-for-production
+      DATABASE_URL: sqlite:///ci-test.db
       PYTHONPATH: .
 
     steps:
@@ -27,6 +28,14 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install pytest pytest-django pytest-cov
+
+      - name: Check for migration drift
+        working-directory: backend
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Apply migrations
+        working-directory: backend
+        run: python manage.py migrate --run-syncdb
 
       - name: Run tests with coverage
         working-directory: backend

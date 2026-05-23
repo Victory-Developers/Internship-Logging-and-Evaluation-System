@@ -39,6 +39,7 @@ const stopPolling = useCallback(() => {
 }, []);                                                                    
                                                                                                                                                                                     
 useEffect(() => {                                  
+// eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCount();                                                                                                                                                                    
     if (!document.hidden) startPolling();                                    
                 

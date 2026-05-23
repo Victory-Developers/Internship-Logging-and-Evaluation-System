@@ -27,7 +27,7 @@ export default function StudentPlacement() {
       setInviteStatus(res.data);
       if (res.data.status === 'existing') setLinkedSupervisor(res.data.user);
       toast.info(res.data.message);
-    } catch (err) {
+    } catch {
       // Errors handled by global interceptor
     } finally { setInviting(false); }
   };
@@ -45,7 +45,7 @@ export default function StudentPlacement() {
       toast.success('Workplace supervisor details saved successfully!');
       setEditingSupervisor(false);
       load();
-    } catch (err) {
+    } catch {
       toast.error('Failed to update supervisor details.');
     } finally {
       setSaving(false);
@@ -212,7 +212,8 @@ function PlacementSubmitForm({ onSuccess }) {
       setInviteStatus(res.data);
       if (res.data.status === 'existing') setLinkedSupervisor(res.data.user);
       toast.info(res.data.message);
-    } catch (err) {
+    } catch {
+      // Errors handled by global interceptor
     } finally { setInviting(false); }
   };
 

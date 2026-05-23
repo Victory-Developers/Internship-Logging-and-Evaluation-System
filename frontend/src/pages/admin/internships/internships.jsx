@@ -1,21 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../../../api/axios";
 
 export default function Internships() {
   const [internships, setInternships] = useState([]);
 
-  useEffect(() => {
-    fetchInternships();
-  }, []);
-
-  const fetchInternships = async () => {
+  const fetchInternships = useCallback(async () => {
     try {
       const res = await api.get("/internships/");
       setInternships(res.data);
     } catch (err) {
       console.error(err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchInternships();
+  }, [fetchInternships]);
 
   return (
     <div>

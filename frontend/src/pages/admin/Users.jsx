@@ -53,7 +53,8 @@ const handleApprove = async (user) => {
         await api.post(ENDPOINTS.ADMIN_USER_APPROVE(user.id));
         toast.success(`${user.full_name} has been approved successfully.`);                                                                                                                                           
         list.refetch();                                                        
-    } catch (err) {
+    } catch {
+        // Systemic routing and HTTP validation errors are intercepted by the global Axios protocol.
     } finally {                                    
         setBusyId(null);                                                                                                                                                               
     }                                                
@@ -66,7 +67,7 @@ const handleReject = async (user) => {
         await api.post(ENDPOINTS.ADMIN_USER_REJECT(user.id));      
         toast.info(`${user.full_name}'s access request has been formally declined.`);                                                                                                                                           
         list.refetch();                                                        
-    } catch (err) {                                  
+    } catch {                                  
         // Systemic routing and HTTP validation errors are intercepted by the global Axios protocol.                                                                                                        
     } finally {                                                  
         setBusyId(null);                                                                                                                                                               

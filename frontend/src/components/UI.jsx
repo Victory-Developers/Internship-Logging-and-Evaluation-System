@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/Gemini_Generated_Image_sb9z89sb9z89sb9z.png';
 
@@ -225,10 +225,11 @@ export function Modal({ open, onClose, title, children, width = 560 }) {
 }
 
 // ── Toast ─────────────────────────────────────────────
-let _setToasts = null
+const _toastRef = { current: null }
 export function ToastProvider() {
   const [toasts, setToasts] = useState([])
-  _setToasts = setToasts
+  // eslint-disable-next-line react-hooks/immutability
+  _toastRef.current = setToasts
 
   return (
     <div style={{
@@ -253,12 +254,13 @@ export function ToastProvider() {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function toast(message, type = 'success') {
-  if (!_setToasts) return
+  if (!_toastRef.current) return
   const id = Date.now()
-  _setToasts(prev => [...prev, { id, message, type }])
+  _toastRef.current(prev => [...prev, { id, message, type }])
   setTimeout(() => {
-    _setToasts(prev => prev.filter(t => t.id !== id))
+    _toastRef.current(prev => prev.filter(t => t.id !== id))
   }, 3500)
 }
 
