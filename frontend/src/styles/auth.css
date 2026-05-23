@@ -179,6 +179,36 @@ box-shadow: 0 2px 0 0 var(--secondary);
 color: var(--outline);
 }
 
+/* PASSWORD TOGGLE */
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper .auth-input {
+  padding-right: 44px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface-variant);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.password-toggle-btn:hover {
+  opacity: 1;
+}
+
 /* ERROR MESSAGE */
 .auth-error {
 background: var(--status-rejected);
