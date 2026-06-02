@@ -2,7 +2,7 @@ import os
 import django
 
 # Initialize the Django execution context environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_project_name.settings')  # Replace with your actual project settings module name
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iles_project.settings')  # Replace with your actual project settings module name
 django.setup()
 
 from django.contrib.auth import get_user_model
