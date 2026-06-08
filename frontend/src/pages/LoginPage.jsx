@@ -22,8 +22,8 @@ export default function LoginPage() {
     console.log(`Attempting login for role: email: ${email}`);
 
     try {
-      await login(email, password);
-      const path = getDashboardPath();
+      const userData = await login(email, password);
+      const path = getDashboardPath(userData);
       console.log(`Login successful! Redirecting to: ${path}`);
       navigate(path);
 
