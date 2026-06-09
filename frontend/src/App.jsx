@@ -5,6 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 // Auth pages
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Student pages
 import StudentDashboard from './pages/student/Dashboard';
@@ -59,6 +61,16 @@ export default function App() {
       <Route
         path="/register"
         element={isAuthenticated ? <Navigate to={getDashboardPath()} replace /> : <RegisterPage />}
+      />
+
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage />} 
+      />
+
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
       />
 
       {/* Student routes */}

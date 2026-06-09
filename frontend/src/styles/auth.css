@@ -225,3 +225,34 @@ color: var(--on-surface-variant);
 color: var(--primary);
 font-weight: 600;
 }
+
+/* PASSWORD REQUIREMENTS CHECKLIST */
+.password-requirements {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-2) 0 0 0;
+}
+
+.password-req-item {
+  font-size: var(--text-label-md);
+  font-family: var(--font-body);
+  padding: 2px 0;
+  transition: color var(--transition-fast);
+  color: var(--status-rejected-text);
+}
+
+.password-req-item.met {
+  color: var(--status-approved-text);
+}
+
+.password-match-status {
+  font-size: var(--text-label-md);
+  font-family: var(--font-body);
+  margin-top: var(--space-2);
+  transition: color var(--transition-fast);
+  color: var(--status-rejected-text);
+}
+
+.password-match-status.matched {
+  color: var(--status-approved-text);
+}

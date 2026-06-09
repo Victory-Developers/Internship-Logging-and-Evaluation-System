@@ -14,6 +14,7 @@ from .serializers import (
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
 )
+from .password_utils import generate_and_send_token
 from apps.shared_permissions import IsStudent
 
 
@@ -159,20 +160,18 @@ class LogoutView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
         request=ForgotPasswordSerializer,
         responses={
-            200: OpenApiResponse(description='Reset token generated successfully'),
+            200: OpenApiResponse(description='Password reset email sent'),
             400: OpenApiResponse(description='Email not found'),
         },
         description=(
-            'Send your email to receive a password reset token. '
-            'In production this token is emailed to you. '
-            'For testing, the token is returned directly in the response.'
+            'Send a password reset link to the provided email address. '
+            'The link expires after 30 minutes.'
         ),
         tags=['Authentication'],
     )
@@ -180,28 +179,21 @@ class ForgotPasswordView(APIView):
         serializer = ForgotPasswordSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
-            user  = CustomUser.objects.get(email=email)
+            user = CustomUser.objects.get(email=email)
 
-            # Delete any old unused tokens for this user
-            PasswordResetToken.objects.filter(
-                user=user,
-                is_used=False
-            ).delete()
-
-            # Create a new token
-            reset_token = PasswordResetToken.objects.create(user=user)
+            try:
+                generate_and_send_token(user)
+            except Exception:
+                return Response(
+                    {'error': 'Failed to send reset email. Please try again later.'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
             return Response(
-                {
-                    'message': 'Password reset token generated. '
-                               'In production this would be sent to your email.',
-                    'token':   str(reset_token.token),
-                    'expires': '30 minutes',
-                },
+                {'message': 'A password reset link has been sent to your email.'},
                 status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
