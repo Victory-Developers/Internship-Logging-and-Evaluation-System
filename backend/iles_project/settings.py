@@ -139,6 +139,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 
 CORS_ALLOWED_ORIGINS = [
+    "https://internship-logging-and-evaluation-s.vercel.app/",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]

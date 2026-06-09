@@ -32,7 +32,7 @@ class Placement(models.Model):
     """
 
     STATUS_CHOICES = [
-        ('pending',   'Pending')
+        ('pending',   'Pending'),
         ('active',    'Active'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
