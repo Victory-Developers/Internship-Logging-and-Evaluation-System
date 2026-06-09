@@ -14,7 +14,7 @@ from .serializers import (
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
 )
-from apps.shared_permission import IsStudent
+from apps.shared_permissions import IsStudent
 
 
 class RegisterView(APIView):
