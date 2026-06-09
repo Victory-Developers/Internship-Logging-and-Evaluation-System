@@ -10,7 +10,6 @@ import { Btn, StatusBadge, EmptyState } from '../../components/UI';
 
 const STATUS_OPTIONS = [
   { value: '',          label: 'All' },
-  { value: 'draft',     label: 'Draft' },
   { value: 'submitted', label: 'Submitted' },
   { value: 'approved',  label: 'Approved' },
   { value: 'rejected',  label: 'Rejected' },
@@ -20,30 +19,25 @@ const formatDate = (s) => s
   ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
   : '—';
 
-export default function StudentWeeklyLogs() {
+export default function WorkplaceLogs() {
   const navigate = useNavigate();
 
   const list = useListQuery({
-    endpoint: ENDPOINTS.MY_LOGS,
+    endpoint: ENDPOINTS.WP_LOGS,
     initialFilters: { status: '' },
-    initialOrdering: '-week_number',
+    initialOrdering: '-submitted_at',
   });
 
   const columns = [
     {
+      key: 'student',
+      header: 'Student',
+      render: (l) => l.student?.full_name || l.student_name || '—',
+    },
+    {
       key: 'week_number',
       header: 'Week',
       render: (l) => `Week ${l.week_number}`,
-    },
-    {
-      key: 'dates',
-      header: 'Period',
-      render: (l) => `${formatDate(l.start_date)} — ${formatDate(l.end_date)}`,
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (l) => <StatusBadge status={l.status} />,
     },
     {
       key: 'submitted_at',
@@ -51,20 +45,18 @@ export default function StudentWeeklyLogs() {
       render: (l) => formatDate(l.submitted_at),
     },
     {
+      key: 'status',
+      header: 'Status',
+      render: (l) => <StatusBadge status={l.status} />,
+    },
+    {
       key: 'actions',
       header: '',
-      width: 160,
+      width: 100,
       render: (l) => (
-        <div style={{ display: 'flex', gap: 6 }}>
-          <Btn variant="secondary" size="sm" onClick={() => navigate(`/student/logs/${l.id}`)}>
-            View
-          </Btn>
-          {l.status === 'draft' && (
-            <Btn variant="ghost" size="sm" onClick={() => navigate(`/student/logs/${l.id}/edit`)}>
-              Edit
-            </Btn>
-          )}
-        </div>
+        <Btn variant="secondary" size="sm" onClick={() => navigate(`/workplace/review/${l.id}`)}>
+          Review
+        </Btn>
       ),
     },
   ];
@@ -75,12 +67,7 @@ export default function StudentWeeklyLogs() {
 
   return (
     <ListPage
-      title="Weekly Logs"
-      actions={
-        <Btn variant="primary" onClick={() => navigate('/student/logs/new')}>
-          + New Log
-        </Btn>
-      }
+      title="Log Reviews"
       controls={
         <FilterBar
           filters={filters}
@@ -96,8 +83,8 @@ export default function StudentWeeklyLogs() {
         rowKey="id"
         empty={
           <EmptyState
-            title="No logs yet"
-            description="Click + New Log to submit your first weekly log."
+            title="No logs to review"
+            description="No student logs have been submitted yet."
           />
         }
       />

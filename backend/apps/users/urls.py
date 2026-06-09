@@ -8,6 +8,7 @@ from .views import (
     LogoutView,
     ForgotPasswordView,
     ResetPasswordView,
+    InviteSupervisorView
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path('logout/',          LogoutView.as_view(),         name='logout'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
     path('reset-password/',  ResetPasswordView.as_view(),  name='reset-password'),
+    path('invite/', InviteSupervisorView.as_view(), name='invite-supervisor')
 ]

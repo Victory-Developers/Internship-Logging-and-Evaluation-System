@@ -5,20 +5,20 @@ import { ENDPOINTS } from '../../api/config';
 import { Card, Field, Input, Btn, Spinner, toast } from '../../components/UI';
 
 const CRITERIA = [
-  { key: 'quality_of_work',    label: 'Quality of Work' },
-  { key: 'internship_report',  label: 'Internship Report' },
-  { key: 'problem_solving',    label: 'Problem Solving' },
-  { key: 'learning_outcomes',  label: 'Learning Outcomes' },
+  { key: 'professionalism',  label: 'Professionalism' },
+  { key: 'technical_skills', label: 'Technical Skills' },
+  { key: 'communication',    label: 'Communication' },
+  { key: 'punctuality',      label: 'Punctuality' },
 ];
 
-export default function SupervisorEvaluationForm() {
+export default function WorkplaceEvaluationForm() {
   const { placementId } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    quality_of_work: '',
-    internship_report: '',
-    problem_solving: '',
-    learning_outcomes: '',
+    professionalism: '',
+    technical_skills: '',
+    communication: '',
+    punctuality: '',
   });
   const [existingId, setExistingId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,18 +26,17 @@ export default function SupervisorEvaluationForm() {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Check if evaluation already exists for this placement
-    api.get(ENDPOINTS.ACADEMIC_EVALUATIONS, { params: { placement: placementId } })
+    api.get(ENDPOINTS.WP_EVALUATIONS, { params: { placement: placementId } })
       .then(res => {
         const evals = Array.isArray(res.data) ? res.data : res.data?.results || [];
         if (evals.length > 0) {
           const existing = evals[0];
           setExistingId(existing.id);
           setForm({
-            quality_of_work: existing.quality_of_work ?? '',
-            internship_report: existing.internship_report ?? '',
-            problem_solving: existing.problem_solving ?? '',
-            learning_outcomes: existing.learning_outcomes ?? '',
+            professionalism: existing.professionalism ?? '',
+            technical_skills: existing.technical_skills ?? '',
+            communication: existing.communication ?? '',
+            punctuality: existing.punctuality ?? '',
           });
         }
       })
@@ -68,13 +67,13 @@ export default function SupervisorEvaluationForm() {
 
     try {
       if (existingId) {
-        await api.patch(ENDPOINTS.ACADEMIC_EVALUATION_DETAIL(existingId), payload);
+        await api.patch(ENDPOINTS.WP_EVALUATION_DETAIL(existingId), payload);
         toast('Evaluation updated');
       } else {
-        await api.post(ENDPOINTS.ACADEMIC_EVALUATIONS, payload);
+        await api.post(ENDPOINTS.WP_EVALUATIONS, payload);
         toast('Evaluation submitted');
       }
-      navigate('/supervisor/scores');
+      navigate('/workplace/evaluations');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
@@ -100,7 +99,7 @@ export default function SupervisorEvaluationForm() {
   return (
     <div style={{ maxWidth: 560, margin: '0 auto' }}>
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-headline-md)', fontWeight: 700, marginBottom: '1.5rem' }}>
-        {existingId ? 'Edit' : 'Submit'} Academic Evaluation
+        {existingId ? 'Edit' : 'Submit'} Workplace Evaluation
       </h1>
 
       <Card>
@@ -121,12 +120,8 @@ export default function SupervisorEvaluationForm() {
           ))}
 
           <div style={{
-            padding: '12px 16px',
-            background: '#D8EDDF',
-            borderRadius: 8,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            padding: '12px 16px', background: '#D8EDDF', borderRadius: 8,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
             <span style={{ fontSize: 14, fontWeight: 500, color: '#1B4332' }}>
               Total: {total} / {filledCount * 10}
@@ -137,7 +132,7 @@ export default function SupervisorEvaluationForm() {
           </div>
 
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-            <Btn variant="secondary" type="button" onClick={() => navigate('/supervisor/students')}>Cancel</Btn>
+            <Btn variant="secondary" type="button" onClick={() => navigate('/workplace/evaluations')}>Cancel</Btn>
             <Btn variant="primary" type="submit" loading={submitting}>
               {existingId ? 'Update Evaluation' : 'Submit Evaluation'}
             </Btn>

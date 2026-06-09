@@ -1,14 +1,38 @@
 from django.db import models
 from django.conf import settings
 
+class Company(models.Model):
+    """A company where students can do their internship."""
+
+    name       = models.CharField(max_length=255)
+    address    = models.TextField(blank=True)
+    email      = models.EmailField(blank=True)
+    phone      = models.CharField(max_length=30, blank=True)
+    website    = models.URLField(blank=True)
+    created_by = models.ForeignKey(
+                     settings.AUTH_USER_MODEL,
+                     on_delete=models.SET_NULL,
+                     null=True,
+                     blank=True,
+                     related_name='created_companies',
+                 )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = 'companies'
+
+    def __str__(self):
+        return self.name
 
 class Placement(models.Model):
     """
     Represents one student's internship placement.
-    Created and managed by Admin.
+    Created by Admin or submitted by STudent (pending approval).
     """
 
     STATUS_CHOICES = [
+        ('pending',   'Pending')
         ('active',    'Active'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
@@ -36,6 +60,14 @@ class Placement(models.Model):
                               related_name='academic_placements',
                               limit_choices_to={'role': 'academic_supervisor'},
                           )
+    
+    company              = models.ForeignKey(
+                            Company,
+                            on_delete=models.SET_NULL,
+                            null=True,
+                            blank=True,
+                            related_name='placements',
+                        )
 
     company_name         = models.CharField(max_length=255)
     company_address      = models.TextField(blank=True)
@@ -46,7 +78,7 @@ class Placement(models.Model):
     end_date             = models.DateField()
     weekly_log_deadline  = models.PositiveSmallIntegerField(
                               default=5,
-                              help_text='Day of week logs are due (1=Mon … 7=Sun)'
+                              help_text='Day of week logs are due (1=Mon ... 7=Sun)'
                           )
 
     status               = models.CharField(
@@ -54,6 +86,11 @@ class Placement(models.Model):
                               choices=STATUS_CHOICES,
                               default='active'
                           )
+    
+    invited_supervisor_email = models.EmailField(
+                                  blank=True,
+                                  help_text='Email of invited workplace supervisor (not yet registered)'
+                              )    
 
     created_by           = models.ForeignKey(
                               settings.AUTH_USER_MODEL,

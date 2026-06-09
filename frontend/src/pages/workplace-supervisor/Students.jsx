@@ -7,16 +7,20 @@ import Table from '../../components/list/Table';
 import Pagination from '../../components/list/Pagination';
 import { Btn, StatusBadge, EmptyState } from '../../components/UI';
 
+
 const formatDate = (s) => s
   ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
   : '—';
 
-export default function SupervisorStudents() {
+
+export default function WorkplaceStudents() {
   const navigate = useNavigate();
 
+
   const list = useListQuery({
-    endpoint: ENDPOINTS.MY_ACADEMIC_STUDENTS,
+    endpoint: ENDPOINTS.WP_STUDENTS,
   });
+
 
   const columns = [
     {
@@ -25,12 +29,12 @@ export default function SupervisorStudents() {
       render: (p) => p.student?.full_name || '—',
     },
     {
-      key: 'company_name',
-      header: 'Company',
-    },
-    {
       key: 'job_title',
       header: 'Job Title',
+    },
+    {
+      key: 'company_name',
+      header: 'Company',
     },
     {
       key: 'dates',
@@ -48,16 +52,13 @@ export default function SupervisorStudents() {
       width: 180,
       render: (p) => (
         <div style={{ display: 'flex', gap: 6 }}>
-          <Btn variant="secondary" size="sm" onClick={() => navigate(`/supervisor/pending-reviews`)}>
-            Logs
-          </Btn>
-          <Btn variant="primary" size="sm" onClick={() => navigate(`/supervisor/evaluate/${p.id}`)}>
-            Evaluate
-          </Btn>
+          <Btn variant="secondary" size="sm" onClick={() => navigate('/workplace/logs')}>Logs</Btn>
+          <Btn variant="primary" size="sm" onClick={() => navigate(`/workplace/evaluate/${p.id}`)}>Evaluate</Btn>
         </div>
       ),
     },
   ];
+
 
   return (
     <ListPage title="My Students">

@@ -8,16 +8,17 @@ const formatDate = (s) => s
   ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
   : '—';
 
-export default function SupervisorReviewLog() {
+export default function WorkplaceReviewLog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [log, setLog] = useState(null);
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState('');
   const [posting, setPosting] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
 
   useEffect(() => {
-    api.get(`${ENDPOINTS.ACADEMIC_LOGS}${id}/`)
+    api.get(`${ENDPOINTS.WP_LOGS}${id}/`)
       .then(res => setLog(res.data))
       .catch(() => toast('Failed to load log', 'error'));
 
@@ -25,6 +26,25 @@ export default function SupervisorReviewLog() {
       .then(res => setComments(Array.isArray(res.data) ? res.data : res.data?.results || []))
       .catch(() => {});
   }, [id]);
+
+  const handleReview = async (action) => {
+    if (action === 'reject' && !comment.trim()) {
+      toast('Please add a comment when rejecting', 'warning');
+      return;
+    }
+    setReviewing(true);
+    try {
+      const payload = { action };
+      if (comment.trim()) payload.comment = comment;
+      await api.post(ENDPOINTS.WP_LOG_REVIEW(id), payload);
+      toast(`Log ${action}d`);
+      navigate('/workplace/logs');
+    } catch (err) {
+      toast(err.response?.data?.detail || `Failed to ${action} log`, 'error');
+    } finally {
+      setReviewing(false);
+    }
+  };
 
   const handleComment = async () => {
     if (!comment.trim()) return;
@@ -47,7 +67,7 @@ export default function SupervisorReviewLog() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <Btn variant="ghost" size="sm" onClick={() => navigate('/supervisor/pending-reviews')} style={{ marginBottom: 8 }}>
+      <Btn variant="ghost" size="sm" onClick={() => navigate('/workplace/logs')} style={{ marginBottom: 8 }}>
         &larr; Back to Logs
       </Btn>
 
@@ -90,18 +110,15 @@ export default function SupervisorReviewLog() {
         </div>
       </Card>
 
-      {/* Comments section */}
+      {/* Comments */}
       <Card>
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: '1rem', color: '#1A1714' }}>Comments</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: '1rem', color: '#1A1714' }}>Comments & Review</h2>
 
         {comments.length > 0 && (
           <div style={{ marginBottom: '1rem' }}>
             {comments.map((c, i) => (
               <div key={c.id || i} style={{
-                padding: '10px 12px',
-                background: '#F0EDE8',
-                borderRadius: 8,
-                marginBottom: 8,
+                padding: '10px 12px', background: '#F0EDE8', borderRadius: 8, marginBottom: 8,
               }}>
                 <div style={{ fontSize: 12, color: '#9A938D', marginBottom: 4 }}>
                   {c.author?.full_name || 'Supervisor'} — {formatDate(c.created_at)}
@@ -115,10 +132,21 @@ export default function SupervisorReviewLog() {
         <Field label="Add Comment">
           <Textarea rows={3} value={comment} onChange={e => setComment(e.target.value)} placeholder="Write your comment..." />
         </Field>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-          <Btn variant="primary" onClick={handleComment} loading={posting} disabled={!comment.trim()}>
-            Post Comment
+
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: '0.75rem' }}>
+          <Btn variant="ghost" onClick={handleComment} loading={posting} disabled={!comment.trim()}>
+            Post Comment Only
           </Btn>
+          {log.status === 'submitted' && (
+            <>
+              <Btn variant="danger" onClick={() => handleReview('reject')} loading={reviewing}>
+                Reject
+              </Btn>
+              <Btn variant="primary" onClick={() => handleReview('approve')} loading={reviewing}>
+                Approve
+              </Btn>
+            </>
+          )}
         </div>
       </Card>
     </div>

@@ -29,11 +29,21 @@ import AdminUsers from './pages/admin/Users';
 import AdminPlacements from './pages/admin/Placements';
 import AdminCreatePlacement from './pages/admin/CreatePlacement';
 import AdminReports from './pages/admin/Reports';
+import AdminLogs from './pages/admin/logs';
+
+// Workplace Supervisor pages
+import WorkplaceDashboard from './pages/workplace-supervisor/Dashboard';
+import WorkplaceStudents from './pages/workplace-supervisor/Students';
+import WorkplaceLogs from './pages/workplace-supervisor/Logs';
+import WorkplaceReviewLog from './pages/workplace-supervisor/ReviewLog';
+import WorkplaceEvaluations from './pages/workplace-supervisor/Evaluations';
+import WorkplaceEvaluationForm from './pages/workplace-supervisor/EvaluationForm';
 
 // Layouts
 import StudentLayout from './layouts/StudentLayout';
 import SupervisorLayout from './layouts/SupervisorLayout';
 import AdminLayout from './layouts/AdminLayout';
+import WorkplaceSupervisorLayout from './layouts/WorkplaceSupervisorLayout';
 
 export default function App() {
   const { getDashboardPath, isAuthenticated } = useAuth();
@@ -44,13 +54,11 @@ export default function App() {
       {/* Public routes */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to={getDashboardPath()} replace 
-/> : <LoginPage />}
+        element={isAuthenticated ? <Navigate to={getDashboardPath()} replace /> : <LoginPage />}
       />
       <Route
         path="/register"
-        element={isAuthenticated ? <Navigate to={getDashboardPath()} replace 
-/> : <RegisterPage />}
+        element={isAuthenticated ? <Navigate to={getDashboardPath()} replace /> : <RegisterPage />}
       />
 
       {/* Student routes */}
@@ -83,12 +91,10 @@ export default function App() {
       >
         <Route path="dashboard" element={<SupervisorDashboard />} />
         <Route path="students" element={<SupervisorStudents />} />
-        <Route path="pending-reviews" element={<SupervisorPendingReviews />}
-/>
+        <Route path="pending-reviews" element={<SupervisorPendingReviews />} />
         <Route path="review/:id" element={<SupervisorReviewLog />} />
         <Route path="scores" element={<SupervisorScoresOverview />} />
-        <Route path="evaluate/:placementId" element={<SupervisorEvaluationForm
-  />} />
+        <Route path="evaluate/:placementId" element={<SupervisorEvaluationForm />} />
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
@@ -105,7 +111,25 @@ export default function App() {
         <Route path="users" element={<AdminUsers />} />
         <Route path="placements" element={<AdminPlacements />} />
         <Route path="placements/new" element={<AdminCreatePlacement />} />
-        <Route path="reports" element={<AdminReports />} />
+        <Route path="logs" element={<AdminLogs />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+      </Route>
+
+      {/* Workplace Supervisor routes */}
+      <Route
+        path="/workplace"
+        element={
+          <ProtectedRoute allowedRoles={['workplace_supervisor']}>
+            <WorkplaceSupervisorLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard" element={<WorkplaceDashboard />} />
+        <Route path="students" element={<WorkplaceStudents />} />
+        <Route path="logs" element={<WorkplaceLogs />} />
+        <Route path="review/:id" element={<WorkplaceReviewLog />} />
+        <Route path="evaluations" element={<WorkplaceEvaluations />} />
+        <Route path="evaluate/:placementId" element={<WorkplaceEvaluationForm />} />
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
