@@ -71,19 +71,18 @@ export default function SupervisorEvaluationForm() {
     try {
       if (existingId) {
         await api.patch(ENDPOINTS.ACADEMIC_EVALUATION_DETAIL(existingId), payload);
-        toast.success('Evaluation rubric successfully modified and committed to registry.');
+        toast.success('Evaluation updated successfully.');
       } else {
         await api.post(ENDPOINTS.ACADEMIC_EVALUATIONS, payload);
-        toast.success('Academic evaluation successfully submitted.');
+        toast.success('Evaluation submitted successfully.');
       }
       navigate('/supervisor/scores');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
+        toast.warning('Please correct the highlighted errors in the form.');
       } 
-      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setSubmitting(false);
     }

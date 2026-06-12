@@ -38,7 +38,7 @@ class PlacementSerializer(serializers.ModelSerializer):
         model  = Placement
         fields = [
             'id', 'student', 'workplace_supervisor', 'academic_supervisor',
-            'company', 'company_detail'
+            'company', 'company_detail',
             'company_name', 'company_address', 'job_title', 'description',
             'start_date', 'end_date', 'weekly_log_deadline',
             'status', 'invited_supervisor_email', 'duration_days', 'created_by', 'created_at', 'updated_at',

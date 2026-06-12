@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
 import useListQuery from '../../hooks/useListQuery';
@@ -8,7 +9,7 @@ import Table from '../../components/list/Table';
 import Pagination from '../../components/list/Pagination';
 import SearchBar from '../../components/list/SearchBar';
 import FilterBar from '../../components/list/FilterBar';
-import { Btn, Modal, StatusBadge, toast, Field, Select, EmptyState } from '../../components/UI';
+import { Btn, Modal, StatusBadge, Field, Select, EmptyState } from '../../components/UI';
 
 const STATUS_OPTIONS = [
   { value: '',          label: 'All statuses' },
@@ -55,11 +56,11 @@ export default function PlacementsPage() {
     setBusyId(placement.id);
     try {
       await api.delete(ENDPOINTS.PLACEMENT_DETAIL(placement.id));
-      toast('Placement deleted');
+      toast('Placement deleted successfully');
       list.refetch();
       if (viewing?.id === placement.id) setViewing(null);
     } catch (err) {
-      toast(err.response?.data?.detail || 'Failed to delete placement', 'error');
+      toast(err.response?.data?.detail || 'Could not delete the placement. Please try again.');
     } finally {
       setBusyId(null);
     }
@@ -67,7 +68,7 @@ export default function PlacementsPage() {
 
   const handleActivate = async (placement) => {
     if (!selectedAcSup) {
-      toast('Please select an academic supervisor first', 'warning');
+      toast('Please select an academic supervisor first');
       return;
     }
     setBusyId(placement.id);
@@ -76,12 +77,12 @@ export default function PlacementsPage() {
         academic_supervisor: selectedAcSup,
         status: 'active',
       });
-      toast('Placement activated');
+      toast('Placement has been successfully activated');
       setViewing(null);
       setSelectedAcSup('');
       list.refetch();
     } catch (err) {
-      toast(err.response?.data?.detail || 'Failed to activate placement', 'error');
+      toast(err.response?.data?.detail || 'Could not activate the placement. Please try again');
     } finally {
       setBusyId(null);
     }

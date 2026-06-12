@@ -107,15 +107,14 @@ export default function AdminCreatePlacement() {
     setSubmitting(true);
     try {
       await api.post(ENDPOINTS.PLACEMENTS, payload);
-      toast.success('Placement configuration successfully instantiated within the central registry.');
+      toast.success('Placement created successfully.');
       navigate('/admin/placements');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast.warning('Payload validation failure. Rectify the highlighted parameter discrepancies.');
+        toast.warning('Please correct the highlighted errors in the form.');
       } 
-      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setSubmitting(false);
     }

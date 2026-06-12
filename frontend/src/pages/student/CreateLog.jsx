@@ -36,16 +36,16 @@ export default function StudentCreateLog() {
       const res = await api.post(ENDPOINTS.MY_LOGS, form);
       if (andSubmit) {
         await api.post(ENDPOINTS.MY_LOG_SUBMIT(res.data.id));
-        toast.success('Log successfully committed to the academic registry.');
+        toast.success('Your log has been successfully submitted!');
       } else {
-        toast.info('Draft configuration retained locally.');
+        toast.info('Draft saved successfully.');
       }
       navigate('/student/logs');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
+        toast.warning('Please correct the highlighted errors in the form.');
       } 
       // Systemic error broadcasting is inherently managed by the global Axios interceptor.
     } finally {

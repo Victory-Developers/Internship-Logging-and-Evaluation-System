@@ -142,7 +142,6 @@ function PlacementSubmitForm({ onSuccess }) {
       if (res.data.status === 'existing') setLinkedSupervisor(res.data.user);
       toast.info(res.data.message);
     } catch (err) {
-      // Systemic error broadcasting is inherently managed by the global Axios interceptor.
     } finally { setInviting(false); }
   };
 
@@ -167,13 +166,13 @@ function PlacementSubmitForm({ onSuccess }) {
 
     try {
       await api.post(ENDPOINTS.STUDENT_PLACEMENT_SUBMIT, payload);
-      toast.success('Placement configuration successfully submitted for administrative review.');
+      toast.success('Your placement request has been submitted successfully for review!');
       onSuccess();
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') { 
         setErrors(data); 
-        toast.warning('Validation failure. Rectify the highlighted input discrepancies.'); 
+        toast.warning('Please correct the highlighted errors in the form.'); 
       }
       // Systemic routing errors handled by global interceptor.
     } finally { setSubmitting(false); }
