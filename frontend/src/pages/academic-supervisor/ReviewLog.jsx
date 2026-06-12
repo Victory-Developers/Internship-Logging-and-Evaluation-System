@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Textarea, Btn, StatusBadge, Spinner, toast } from '../../components/UI';
+import { Card, Field, Textarea, Btn, StatusBadge, Spinner } from '../../components/UI';
 
 const formatDate = (s) => s
   ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -19,7 +20,9 @@ export default function SupervisorReviewLog() {
   useEffect(() => {
     api.get(`${ENDPOINTS.ACADEMIC_LOGS}${id}/`)
       .then(res => setLog(res.data))
-      .catch(() => toast('Failed to load log', 'error'));
+      .catch(() => {
+          // Systemic routing and retrieval anomalies are handled by the global HTTP interceptor.
+      });
 
     api.get(ENDPOINTS.LOG_COMMENTS(id))
       .then(res => setComments(Array.isArray(res.data) ? res.data : res.data?.results || []))
@@ -33,9 +36,9 @@ export default function SupervisorReviewLog() {
       const res = await api.post(ENDPOINTS.LOG_COMMENTS(id), { content: comment });
       setComments(prev => [...prev, res.data]);
       setComment('');
-      toast('Comment added');
+      toast.success('Supervisory commentary successfully appended to the central registry.');
     } catch {
-      toast('Failed to add comment', 'error');
+      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setPosting(false);
     }

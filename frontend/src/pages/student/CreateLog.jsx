@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Input, Textarea, Btn, toast } from '../../components/UI';
+import { Card, Field, Input, Textarea, Btn } from '../../components/UI';
 
 export default function StudentCreateLog() {
   const navigate = useNavigate();
@@ -35,19 +36,18 @@ export default function StudentCreateLog() {
       const res = await api.post(ENDPOINTS.MY_LOGS, form);
       if (andSubmit) {
         await api.post(ENDPOINTS.MY_LOG_SUBMIT(res.data.id));
-        toast('Log submitted');
+        toast.success('Log successfully committed to the academic registry.');
       } else {
-        toast('Draft saved');
+        toast.info('Draft configuration retained locally.');
       }
       navigate('/student/logs');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast('Please fix the errors', 'error');
-      } else {
-        toast('Failed to save log', 'error');
-      }
+        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
+      } 
+      // Systemic error broadcasting is inherently managed by the global Axios interceptor.
     } finally {
       setSubmitting(false);
     }

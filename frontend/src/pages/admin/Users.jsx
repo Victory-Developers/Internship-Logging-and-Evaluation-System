@@ -1,5 +1,6 @@
 import React, { useState } from 'react';                                                                                                                                             
-import { useSearchParams } from 'react-router-dom';                                                                                                                                  
+import { useSearchParams } from 'react-router-dom';   
+import { toast } from 'react-toastify';                                                                                                                               
 import api from '../../api/axios';                                                                                                                                                   
 import { ENDPOINTS } from '../../api/config';                                                                                                                                        
 import useListQuery from '../../hooks/useListQuery';                         
@@ -8,7 +9,7 @@ import Table from '../../components/list/Table';
 import Pagination from '../../components/list/Pagination';                                                                                                                           
 import SearchBar from '../../components/list/SearchBar';         
 import FilterBar from '../../components/list/FilterBar';                                                                                                                             
-import { Btn, Modal, StatusBadge, toast, Field } from '../../components/UI'; 
+import { Btn, Modal, StatusBadge, Field } from '../../components/UI'; 
                                                                                                                                                                                     
 const ROLE_OPTIONS = [                                                                                                                                                               
 { value: '',                      label: 'All' },  
@@ -49,13 +50,13 @@ const handleApprove = async (user) => {
     if (!confirm(`Approve ${user.full_name}? They will receive an email and can log in immediately.`)) return;                                                                       
     setBusyId(user.id);                                                      
     try {                                                                                                                                                                            
-    await api.post(ENDPOINTS.ADMIN_USER_APPROVE(user.id));
-    toast(`${user.full_name} approved`);                                                                                                                                           
-    list.refetch();                                                        
+        await api.post(ENDPOINTS.ADMIN_USER_APPROVE(user.id));
+        toast.success(`${user.full_name} has been granted operational clearance.`);                                                                                                                                           
+        list.refetch();                                                        
     } catch (err) {                                                                                                                                                                  
-    toast(err.response?.data?.detail || 'Failed to approve user', 'error');
+        // Systemic routing and HTTP validation errors are intercepted by the global Axios protocol.
     } finally {                                    
-    setBusyId(null);                                                                                                                                                               
+        setBusyId(null);                                                                                                                                                               
     }                                                
 };                                                                                                                                                                                 
                                                                             
@@ -63,13 +64,13 @@ const handleReject = async (user) => {
     if (!confirm(`Reject ${user.full_name}? They will receive an email and won't be able to log in.`)) return;
     setBusyId(user.id);                                                                                                                                                              
     try {                                                                                                                                                                            
-    await api.post(ENDPOINTS.ADMIN_USER_REJECT(user.id));      
-    toast(`${user.full_name} rejected`);                                                                                                                                           
-    list.refetch();                                                        
+        await api.post(ENDPOINTS.ADMIN_USER_REJECT(user.id));      
+        toast.info(`${user.full_name}'s access request has been formally declined.`);                                                                                                                                           
+        list.refetch();                                                        
     } catch (err) {                                  
-    toast(err.response?.data?.detail || 'Failed to reject user', 'error');                                                                                                         
+        // Systemic routing and HTTP validation errors are intercepted by the global Axios protocol.                                                                                                        
     } finally {                                                  
-    setBusyId(null);                                                                                                                                                               
+        setBusyId(null);                                                                                                                                                               
     }                                                                        
 };                                                             
                                                                                                                                                                                     
@@ -227,4 +228,4 @@ background: 'var(--surface-container-low)',
 borderRadius: 'var(--radius-sm)',                                          
 fontSize: 14,                        
 color: 'var(--on-surface)',                        
-};  
+};

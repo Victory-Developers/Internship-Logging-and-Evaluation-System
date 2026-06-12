@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Textarea, Btn, StatusBadge, Spinner, toast } from '../../components/UI';
+import { Card, Field, Textarea, Btn, StatusBadge, Spinner } from '../../components/UI';
 
 const formatDate = (s) => s
   ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -20,7 +21,9 @@ export default function WorkplaceReviewLog() {
   useEffect(() => {
     api.get(`${ENDPOINTS.WP_LOGS}${id}/`)
       .then(res => setLog(res.data))
-      .catch(() => toast('Failed to load log', 'error'));
+      .catch(() => {
+        // Systemic routing and retrieval anomalies are handled by the global HTTP interceptor.
+      });
 
     api.get(ENDPOINTS.LOG_COMMENTS(id))
       .then(res => setComments(Array.isArray(res.data) ? res.data : res.data?.results || []))
@@ -29,7 +32,7 @@ export default function WorkplaceReviewLog() {
 
   const handleReview = async (action) => {
     if (action === 'reject' && !comment.trim()) {
-      toast('Please add a comment when rejecting', 'warning');
+      toast.warning('Mandatory commentary required for rejection payload.');
       return;
     }
     setReviewing(true);
@@ -37,10 +40,10 @@ export default function WorkplaceReviewLog() {
       const payload = { action };
       if (comment.trim()) payload.comment = comment;
       await api.post(ENDPOINTS.WP_LOG_REVIEW(id), payload);
-      toast(`Log ${action}d`);
+      toast.success(`Activity log status successfully mutated to: ${action}.`);
       navigate('/workplace/logs');
     } catch (err) {
-      toast(err.response?.data?.detail || `Failed to ${action} log`, 'error');
+      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setReviewing(false);
     }
@@ -53,9 +56,9 @@ export default function WorkplaceReviewLog() {
       const res = await api.post(ENDPOINTS.LOG_COMMENTS(id), { content: comment });
       setComments(prev => [...prev, res.data]);
       setComment('');
-      toast('Comment added');
+      toast.success('Supervisory commentary successfully appended to the central registry.');
     } catch {
-      toast('Failed to add comment', 'error');
+      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setPosting(false);
     }

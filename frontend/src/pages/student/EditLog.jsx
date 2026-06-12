@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Input, Textarea, Btn, Spinner, toast } from '../../components/UI';
+import { Card, Field, Input, Textarea, Btn, Spinner } from '../../components/UI';
 
 export default function StudentEditLog() {
   const { id } = useParams();
@@ -14,7 +15,9 @@ export default function StudentEditLog() {
   useEffect(() => {
     api.get(ENDPOINTS.MY_LOG_DETAIL(id))
       .then(res => setForm(res.data))
-      .catch(() => toast('Failed to load log', 'error'));
+      .catch(() => {
+         // Network anomalies are intercepted and broadcast by the global HTTP interceptor.
+      });
   }, [id]);
 
   if (!form) {
@@ -53,21 +56,22 @@ export default function StudentEditLog() {
         challenges: form.challenges,
         next_week: form.next_week,
       });
+      
       if (andSubmit) {
         await api.post(ENDPOINTS.MY_LOG_SUBMIT(id));
-        toast('Log submitted');
+        toast.success('Log successfully committed to the academic registry.');
       } else {
-        toast('Draft saved');
+        toast.info('Draft modifications retained locally.');
       }
       navigate('/student/logs');
+      
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast('Please fix the errors', 'error');
-      } else {
-        toast('Failed to save log', 'error');
-      }
+        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
+      } 
+      // Systemic routing and 5XX errors handled by global interceptor.
     } finally {
       setSubmitting(false);
     }

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import { ENDPOINTS } from '../../api/config';
-import { Card, Field, Input, Btn, Spinner, toast } from '../../components/UI';
+import { Card, Field, Input, Btn, Spinner } from '../../components/UI';
 
 const CRITERIA = [
   { key: 'quality_of_work',    label: 'Quality of Work' },
@@ -26,7 +27,6 @@ export default function SupervisorEvaluationForm() {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Check if evaluation already exists for this placement
     api.get(ENDPOINTS.ACADEMIC_EVALUATIONS, { params: { placement: placementId } })
       .then(res => {
         const evals = Array.isArray(res.data) ? res.data : res.data?.results || [];
@@ -41,7 +41,9 @@ export default function SupervisorEvaluationForm() {
           });
         }
       })
-      .catch(() => {})
+      .catch(() => {
+         // Network anomalies are intercepted and broadcast by the global HTTP interceptor.
+      })
       .finally(() => setLoading(false));
   }, [placementId]);
 
@@ -69,20 +71,19 @@ export default function SupervisorEvaluationForm() {
     try {
       if (existingId) {
         await api.patch(ENDPOINTS.ACADEMIC_EVALUATION_DETAIL(existingId), payload);
-        toast('Evaluation updated');
+        toast.success('Evaluation rubric successfully modified and committed to registry.');
       } else {
         await api.post(ENDPOINTS.ACADEMIC_EVALUATIONS, payload);
-        toast('Evaluation submitted');
+        toast.success('Academic evaluation successfully submitted.');
       }
       navigate('/supervisor/scores');
     } catch (err) {
       const data = err.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        toast('Please fix the errors', 'error');
-      } else {
-        toast('Failed to save evaluation', 'error');
-      }
+        toast.warning('Validation failure. Rectify the highlighted input discrepancies.');
+      } 
+      // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
       setSubmitting(false);
     }
