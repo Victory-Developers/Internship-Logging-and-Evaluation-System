@@ -20,15 +20,43 @@ loading = false,
 empty = null,                                                              
 onRowClick,                                                                                                                                                                        
 }) {                                                                         
-if (loading) {                                                                                                                                                                     
-    return (                                                                 
-    <div className="data-table-wrapper">                                                                                                                                           
-        <div className="data-table__loading">                                
-        <Spinner />                                
-        </div>                                     
-    </div>                                       
-    );                                   
-}                                                                                                                                                                                  
+if (loading) {
+    return (
+    <div className="data-table-wrapper">
+        <table className="data-table">
+        <thead>
+            <tr>
+            {columns.map((col) => (
+                <th
+                key={col.key}
+                style={{
+                    width: col.width,
+                    textAlign: col.align || 'left',
+                }}
+                >
+                {col.header}
+                </th>
+            ))}
+            </tr>
+        </thead>
+        <tbody>
+            {[1, 2, 3, 4, 5].map((idx) => (
+            <tr key={idx}>
+                {columns.map((col) => (
+                <td
+                    key={col.key}
+                    style={{ textAlign: col.align || 'left' }}
+                >
+                    <div className="skeleton-box" style={{ height: '1.25rem', width: '85%', margin: '4px 0' }} />
+                </td>
+                ))}
+            </tr>
+            ))}
+        </tbody>
+        </table>
+    </div>
+   );
+}                                                                                                                                                                                
                                                     
 if (!rows.length) {                                                                                                                                                                
     return (                                                                 

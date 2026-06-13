@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import '../styles/layout.css';
+import logoImg from '../assets/Gemini_Generated_Image_sb9z89sb9z89sb9z.png';
 
 export default function StudentLayout() {
 const { user, logout } = useAuth();
@@ -16,7 +17,7 @@ return (
     <aside className="sidebar sidebar-student">
 
         <div className="sidebar-brand">
-        <div className="sidebar-brand-icon">IL</div>
+        <img src={logoImg} alt="ILES Logo" className="sidebar-brand-icon" style={{ objectFit: 'contain' }} />
         <span className="sidebar-brand-text">ILES</span>
         </div>
 

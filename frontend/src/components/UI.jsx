@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
+import logoImg from '../assets/Gemini_Generated_Image_sb9z89sb9z89sb9z.png';
 
-// ── Navbar ───────────────────────────────────────────
 export function Navbar({ title, subtitle }) {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -15,11 +15,7 @@ export function Navbar({ title, subtitle }) {
       height: 60, position: 'sticky', top: 0, zIndex: 100,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div style={{
-          width: 32, height: 32, background: '#2D6A4F', borderRadius: 8,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14, color: '#fff', letterSpacing: '-0.5px'
-        }}>IL</div>
+        <img src={logoImg} alt="ILES Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, letterSpacing: '-0.3px', lineHeight: 1.2 }}>
             {title || 'ILES'}
@@ -266,18 +262,67 @@ export function toast(message, type = 'success') {
   }, 3500)
 }
 
-// ── Spinner ──────────────────────────────────────────
-export function Spinner({ size = 32, color = '#2D6A4F' }) {
+export function Spinner() {
   return (
     <div style={{
-      width: size, height: size, border: `3px solid #E2DDD6`,
-      borderTopColor: color, borderRadius: '50%',
-      animation: 'spin 0.7s linear infinite'
-    }} />
-  )
+      width: '100%',
+      maxWidth: 720,
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1.25rem',
+      padding: '1.5rem',
+      boxSizing: 'border-box',
+    }}>
+      {/* Skeleton header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        <div className="skeleton-box" style={{ width: 48, height: 48, borderRadius: '50%' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+          <div className="skeleton-box" style={{ height: '1.25rem', width: '35%' }} />
+          <div className="skeleton-box" style={{ height: '0.875rem', width: '55%' }} />
+        </div>
+      </div>
+
+      {/* Skeleton card content */}
+      <div style={{
+        background: '#FFFFFF',
+        borderRadius: 14,
+        border: '1px solid #E2DDD6',
+        padding: '1.5rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1.25rem',
+      }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="skeleton-box" style={{ height: 14, width: '40%' }} />
+            <div className="skeleton-box" style={{ height: 38 }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="skeleton-box" style={{ height: 14, width: '30%' }} />
+            <div className="skeleton-box" style={{ height: 38 }} />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div className="skeleton-box" style={{ height: 14, width: '20%' }} />
+          <div className="skeleton-box" style={{ height: 100 }} />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div className="skeleton-box" style={{ height: 14, width: '25%' }} />
+          <div className="skeleton-box" style={{ height: 80 }} />
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+          <div className="skeleton-box" style={{ height: 36, width: 90 }} />
+          <div className="skeleton-box" style={{ height: 36, width: 120 }} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
-// ── Empty State ───────────────────────────────────────
+
 export function EmptyState({ icon, title, description, action }) {
   return (
     <div style={{
