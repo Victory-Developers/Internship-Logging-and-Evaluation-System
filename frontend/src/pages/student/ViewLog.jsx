@@ -47,7 +47,7 @@ export default function StudentViewLog() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <Field label="Period">
-              <div style={detailStyle}>{formatDate(log.start_date)} — {formatDate(log.end_date)}</div>
+              <div style={detailStyle}>{formatDate(log.week_start)} — {formatDate(log.week_end)}</div>
             </Field>
             <Field label="Submitted">
               <div style={detailStyle}>{formatDate(log.submitted_at)}</div>

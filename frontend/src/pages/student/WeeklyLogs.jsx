@@ -38,7 +38,7 @@ export default function StudentWeeklyLogs() {
     {
       key: 'dates',
       header: 'Period',
-      render: (l) => `${formatDate(l.start_date)} — ${formatDate(l.end_date)}`,
+      render: (l) => `${formatDate(l.week_start)} — ${formatDate(l.week_end)}`,
     },
     {
       key: 'status',

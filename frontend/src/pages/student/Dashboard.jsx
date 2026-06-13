@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../../api/axios'
 import { ENDPOINTS } from '../../api/config'
+import useAuth from '../../hooks/useAuth'
 
 const logsAPI = {
   getMyLogs: () => api.get(ENDPOINTS.MY_LOGS),
@@ -206,14 +208,10 @@ function LogDetailView({ log }) {
 }
 
 export default function StudentDashboard() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [editLog, setEditLog] = useState(null)
-  const [viewLog, setViewLog] = useState(null)
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [formErrors, setFormErrors] = useState({})
-  const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(null)
   const [submitting, setSubmitting] = useState(null)
 
@@ -233,82 +231,6 @@ export default function StudentDashboard() {
   useEffect(() => {
     fetchLogs()
   }, [fetchLogs])
-
-  function openCreate() {
-    setEditLog(null)
-    setForm(EMPTY_FORM)
-    setFormErrors({})
-    setShowForm(true)
-  }
-
-  function openEdit(log) {
-    setEditLog(log)
-    setForm({
-      week_number: log.week_number || '',
-      date: log.date || '',
-      activities_performed: log.activities_performed || '',
-      skills_gained: log.skills_gained || '',
-      challenges_faced: log.challenges_faced || '',
-    })
-    setFormErrors({})
-    setShowForm(true)
-  }
-
-  function validateForm() {
-    const e = {}
-    const week = Number(form.week_number)
-
-    if (!form.week_number) e.week_number = 'Week number is required'
-    else if (Number.isNaN(week) || week < 1 || week > 52) e.week_number = 'Must be between 1 and 52'
-
-    if (!form.date) e.date = 'Date is required'
-    if (!form.activities_performed.trim()) e.activities_performed = 'Activities are required'
-    if (!form.skills_gained.trim()) e.skills_gained = 'Skills gained is required'
-    if (!form.challenges_faced.trim()) e.challenges_faced = 'Challenges faced is required'
-
-    return e
-  }
-
-  async function handleSave(submitAfter = false) {
-    const errs = validateForm()
-    if (Object.keys(errs).length) {
-      setFormErrors(errs)
-      return
-    }
-
-    setSaving(true)
-    try {
-      if (editLog) {
-        await logsAPI.updateLog(editLog.id, {
-          ...form,
-          week_number: Number(form.week_number),
-          status: 'draft',
-        })
-        notify('Log updated successfully')
-      } else {
-        const { data } = await logsAPI.createLog({
-          ...form,
-          week_number: Number(form.week_number),
-          status: 'draft',
-        })
-
-        if (submitAfter) {
-          await logsAPI.submitLog(data.id)
-          notify('Log created and submitted')
-        } else {
-          notify('Log saved as draft')
-        }
-      }
-
-      setShowForm(false)
-      setEditLog(null)
-      fetchLogs()
-    } catch (err) {
-      notify(err?.response?.data?.detail || 'Failed to save log', 'error')
-    } finally {
-      setSaving(false)
-    }
-  }
 
   async function handleSubmit(id) {
     setSubmitting(id)
@@ -357,44 +279,14 @@ export default function StudentDashboard() {
   return (
     <section style={{ padding: '1rem' }}>
       <div className="fade-in">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: '2rem',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div>
-            <h1
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 28,
-                fontWeight: 800,
-                color: '#1A1714',
-                letterSpacing: '-0.8px',
-              }}
-            >
-              My Internship Logs
-            </h1>
-            <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>
-              Document your weekly activities, skills, and progress
-            </p>
-          </div>
-
-          <button
-            onClick={openCreate}
-            style={{ ...buttonBase, background: '#002452', color: '#ffffff', display: 'inline-flex', gap: 8, alignItems: 'center' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            New Log Entry
-          </button>
+        <div style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1A1714', fontFamily: 'var(--font-display)', letterSpacing: '-0.5px' }}>
+            Welcome back, {user?.full_name || 'Student'}!
+          </h2>
+          <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>
+            Here is an overview of your weekly internship logging progress.
+          </p>
         </div>
-
         <div
           style={{
             display: 'grid',
@@ -472,7 +364,7 @@ export default function StudentDashboard() {
               <h3 style={{ fontSize: 18, marginBottom: 6 }}>No logs yet</h3>
               <p style={{ marginBottom: 14 }}>Start documenting your internship experience by creating your first weekly log.</p>
               <button
-                onClick={openCreate}
+                onClick={() => navigate('/student/logs/new')}
                 style={{ ...buttonBase, background: '#002452', color: '#fff' }}
               >
                 Create First Log
@@ -483,7 +375,7 @@ export default function StudentDashboard() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    {['Week', 'Date', 'Activities (Preview)', 'Status', 'Actions'].map((h) => (
+                    {['Week', 'Period', 'Activities (Preview)', 'Status', 'Actions'].map((h) => (
                       <th
                         key={h}
                         style={{
@@ -530,14 +422,11 @@ export default function StudentDashboard() {
                         </div>
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: 14, color: '#374151', whiteSpace: 'nowrap' }}>
-                        {log.date
-                          ? new Date(log.date).toLocaleDateString('en-GB', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })
+                        {log.week_start && log.week_end
+                          ? `${new Date(log.week_start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — ${new Date(log.week_end).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
                           : '—'}
                       </td>
+
                       <td style={{ padding: '12px 16px', maxWidth: 280 }}>
                         <div
                           style={{
@@ -548,8 +437,8 @@ export default function StudentDashboard() {
                             textOverflow: 'ellipsis',
                           }}
                         >
-                          {log.activities_performed?.substring(0, 80) || '—'}
-                          {log.activities_performed?.length > 80 ? '...' : ''}
+                          {log.activities?.substring(0, 80) || '—'}
+                          {log.activities?.length > 80 ? '...' : ''}
                         </div>
                       </td>
                       <td style={{ padding: '12px 16px' }}>
@@ -558,7 +447,7 @@ export default function StudentDashboard() {
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                           <button
-                            onClick={() => setViewLog(log)}
+                           onClick={() => navigate(`/student/logs/${log.id}`)}
                             style={{ ...buttonBase, background: '#f3f4f6', color: '#111827', padding: '0.35rem 0.6rem' }}
                           >
                             View
@@ -567,7 +456,7 @@ export default function StudentDashboard() {
                           {log.status === 'draft' ? (
                             <>
                               <button
-                                onClick={() => openEdit(log)}
+                                onClick={() => navigate(`/student/logs/${log.id}/edit`)}
                                 style={{ ...buttonBase, background: '#e5e7eb', color: '#111827', padding: '0.35rem 0.6rem' }}
                               >
                                 Edit
@@ -626,266 +515,6 @@ export default function StudentDashboard() {
           )}
         </div>
       </div>
-
-      {showForm ? (
-        <div
-          onClick={() => {
-            if (!saving) setShowForm(false)
-          }}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.4)',
-            display: 'grid',
-            placeItems: 'center',
-            zIndex: 1000,
-            padding: 16,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: 'min(680px, 96vw)',
-              maxHeight: '92vh',
-              overflowY: 'auto',
-              background: '#fff',
-              borderRadius: 12,
-              border: '1px solid #e5e7eb',
-              padding: '1rem',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-              <h3 style={{ fontSize: 18 }}>{editLog ? `Edit - Week ${editLog.week_number}` : 'New Log Entry'}</h3>
-              <button
-                onClick={() => setShowForm(false)}
-                disabled={saving}
-                style={{ ...buttonBase, background: '#f3f4f6', color: '#111827', padding: '0.3rem 0.55rem' }}
-              >
-                Close
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <SectionHeader number="01" title="Week Information" />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <FormField label="Week Number" required error={formErrors.week_number}>
-                  <input
-                    type="number"
-                    min="1"
-                    max="52"
-                    placeholder="e.g. 3"
-                    value={form.week_number}
-                    onChange={(e) => setForm((f) => ({ ...f, week_number: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      padding: '9px 12px',
-                      border: `1px solid ${formErrors.week_number ? '#b91c1c' : '#d1d5db'}`,
-                      borderRadius: 8,
-                      fontSize: 14,
-                      color: '#111827',
-                      outline: 'none',
-                    }}
-                  />
-                </FormField>
-
-                <FormField label="Date" required error={formErrors.date}>
-                  <input
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      padding: '9px 12px',
-                      border: `1px solid ${formErrors.date ? '#b91c1c' : '#d1d5db'}`,
-                      borderRadius: 8,
-                      fontSize: 14,
-                      color: '#111827',
-                      outline: 'none',
-                    }}
-                  />
-                </FormField>
-              </div>
-
-              <SectionHeader number="02" title="Activities Performed" />
-              <FormField
-                label="Describe the tasks and activities you performed this week"
-                required
-                error={formErrors.activities_performed}
-              >
-                <textarea
-                  rows={5}
-                  placeholder="List all activities you performed during this week. Be specific about tasks, projects, and responsibilities."
-                  value={form.activities_performed}
-                  onChange={(e) => setForm((f) => ({ ...f, activities_performed: e.target.value }))}
-                  style={{
-                    width: '100%',
-                    padding: '9px 12px',
-                    border: `1px solid ${formErrors.activities_performed ? '#b91c1c' : '#d1d5db'}`,
-                    borderRadius: 8,
-                    fontSize: 14,
-                    color: '#111827',
-                    outline: 'none',
-                    resize: 'vertical',
-                  }}
-                />
-              </FormField>
-
-              <SectionHeader number="03" title="Skills Gained" />
-              <FormField
-                label="What new skills or knowledge did you acquire?"
-                required
-                error={formErrors.skills_gained}
-              >
-                <textarea
-                  rows={4}
-                  placeholder="Technical skills, soft skills, domain knowledge, tools learned."
-                  value={form.skills_gained}
-                  onChange={(e) => setForm((f) => ({ ...f, skills_gained: e.target.value }))}
-                  style={{
-                    width: '100%',
-                    padding: '9px 12px',
-                    border: `1px solid ${formErrors.skills_gained ? '#b91c1c' : '#d1d5db'}`,
-                    borderRadius: 8,
-                    fontSize: 14,
-                    color: '#111827',
-                    outline: 'none',
-                    resize: 'vertical',
-                  }}
-                />
-              </FormField>
-
-              <SectionHeader number="04" title="Challenges Faced" />
-              <FormField
-                label="What challenges did you encounter and how did you handle them?"
-                required
-                error={formErrors.challenges_faced}
-              >
-                <textarea
-                  rows={4}
-                  placeholder="Describe any difficulties, obstacles, or learning curves you experienced."
-                  value={form.challenges_faced}
-                  onChange={(e) => setForm((f) => ({ ...f, challenges_faced: e.target.value }))}
-                  style={{
-                    width: '100%',
-                    padding: '9px 12px',
-                    border: `1px solid ${formErrors.challenges_faced ? '#b91c1c' : '#d1d5db'}`,
-                    borderRadius: 8,
-                    fontSize: 14,
-                    color: '#111827',
-                    outline: 'none',
-                    resize: 'vertical',
-                  }}
-                />
-              </FormField>
-
-              {editLog?.supervisor_comment ? (
-                <>
-                  <SectionHeader number="05" title="Supervisor Comments" />
-                  <div
-                    style={{
-                      background: '#D8EDDF',
-                      border: '1px solid #B7D9C5',
-                      borderRadius: 8,
-                      padding: '12px 14px',
-                      fontSize: 14,
-                      color: '#1B4332',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: '#2D6A4F',
-                        marginBottom: 6,
-                        letterSpacing: '0.3px',
-                      }}
-                    >
-                      SUPERVISOR FEEDBACK
-                    </div>
-                    {editLog.supervisor_comment}
-                  </div>
-                </>
-              ) : null}
-
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 10,
-                  paddingTop: '0.5rem',
-                  borderTop: '1px solid #e5e7eb',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <button
-                  onClick={() => setShowForm(false)}
-                  disabled={saving}
-                  style={{ ...buttonBase, background: '#e5e7eb', color: '#111827' }}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={() => handleSave(false)}
-                  disabled={saving}
-                  style={{ ...buttonBase, background: '#f3f4f6', color: '#111827' }}
-                >
-                  {saving ? 'Saving...' : 'Save as Draft'}
-                </button>
-
-                {!editLog ? (
-                  <button
-                    onClick={() => handleSave(true)}
-                    disabled={saving}
-                    style={{ ...buttonBase, background: '#C8A217', color: '#111827' }}
-                  >
-                    {saving ? 'Saving...' : 'Submit Log'}
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {viewLog ? (
-        <div
-          onClick={() => setViewLog(null)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.4)',
-            display: 'grid',
-            placeItems: 'center',
-            zIndex: 1000,
-            padding: 16,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: 'min(620px, 96vw)',
-              maxHeight: '92vh',
-              overflowY: 'auto',
-              background: '#fff',
-              borderRadius: 12,
-              border: '1px solid #e5e7eb',
-              padding: '1rem',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-              <h3 style={{ fontSize: 18 }}>{`Week ${viewLog.week_number} Log`}</h3>
-              <button
-                onClick={() => setViewLog(null)}
-                style={{ ...buttonBase, background: '#f3f4f6', color: '#111827', padding: '0.3rem 0.55rem' }}
-              >
-                Close
-              </button>
-            </div>
-            <LogDetailView log={viewLog} />
-          </div>
-        </div>
-      ) : null}
     </section>
   )
 }
