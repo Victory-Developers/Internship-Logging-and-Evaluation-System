@@ -195,7 +195,8 @@ class MyPlacementView(APIView):
             if workplace_supervisor_id == '' or workplace_supervisor_id == 0:
                 placement.workplace_supervisor = None
             else:
-                from apps.users.models import User
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
                 try:
                     supervisor = User.objects.get(id=workplace_supervisor_id, role='workplace_supervisor')
                     placement.workplace_supervisor = supervisor
@@ -204,6 +205,7 @@ class MyPlacementView(APIView):
 
         placement.save()
         return Response(PlacementSerializer(placement).data)
+
 
 
 class StudentPlacementSubmitView(APIView):
