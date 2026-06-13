@@ -40,6 +40,7 @@ import WorkplaceLogs from './pages/workplace-supervisor/Logs';
 import WorkplaceReviewLog from './pages/workplace-supervisor/ReviewLog';
 import WorkplaceEvaluations from './pages/workplace-supervisor/Evaluations';
 import WorkplaceEvaluationForm from './pages/workplace-supervisor/EvaluationForm';
+import ProfilePage from './pages/ProfilePage';
 
 // Layouts
 import StudentLayout from './layouts/StudentLayout';
@@ -89,6 +90,7 @@ export default function App() {
         <Route path="logs/:id" element={<StudentViewLog />} />
         <Route path="logs/:id/edit" element={<StudentEditLog />} />
         <Route path="scores" element={<StudentScores />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
@@ -107,6 +109,7 @@ export default function App() {
         <Route path="review/:id" element={<SupervisorReviewLog />} />
         <Route path="scores" element={<SupervisorScoresOverview />} />
         <Route path="evaluate/:placementId" element={<SupervisorEvaluationForm />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
@@ -124,6 +127,7 @@ export default function App() {
         <Route path="placements" element={<AdminPlacements />} />
         <Route path="placements/new" element={<AdminCreatePlacement />} />
         <Route path="logs" element={<AdminLogs />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 
@@ -142,6 +146,7 @@ export default function App() {
         <Route path="review/:id" element={<WorkplaceReviewLog />} />
         <Route path="evaluations" element={<WorkplaceEvaluations />} />
         <Route path="evaluate/:placementId" element={<WorkplaceEvaluationForm />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
 

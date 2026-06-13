@@ -105,12 +105,27 @@ export function AuthProvider({ children }) {
     toast.info('You have logged out successfully.');
   };
 
+  // REFRESH USER PROFILE DATA
+  const refreshUser = async () => {
+    try {
+      const response = await api.get(ENDPOINTS.PROFILE);
+      dispatch({
+        type: 'LOGIN',
+        payload: { user: response.data },
+      });
+      return response.data;
+    } catch (error) {
+      // ignore errors
+    }
+  };
+
   const value = {
     user: state.user,
     isAuthenticated: state.isAuthenticated,
     loading: state.loading,
     login,
     logout,
+    refreshUser,
   };
 
   return (

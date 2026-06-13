@@ -45,7 +45,10 @@ return (
         <NavLink to="/admin/placements/new" className="sidebar-cta-btn">
             + New Placement
         </NavLink>
-        <button onClick={handleLogout} className="sidebar-footer-link">
+        <NavLink to="/admin/profile" className="sidebar-profile-link">
+            My Profile
+        </NavLink>
+        <button onClick={handleLogout} className="sidebar-logout-btn">
             Logout
         </button>
         </div>
