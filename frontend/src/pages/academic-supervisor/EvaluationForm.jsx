@@ -98,7 +98,7 @@ export default function SupervisorEvaluationForm() {
   }
 
   return (
-    <div style={{ maxWidth: 560, margin: '0 auto' }}>
+    <div style={{ width: '100%' }}>
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-headline-md)', fontWeight: 700, marginBottom: '1.5rem' }}>
         {existingId ? 'Edit' : 'Submit'} Academic Evaluation
       </h1>

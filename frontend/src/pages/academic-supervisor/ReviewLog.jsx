@@ -13,30 +13,29 @@ export default function SupervisorReviewLog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [log, setLog] = useState(null);
-  const [comments, setComments] = useState([]);
   const [comment, setComment] = useState('');
   const [posting, setPosting] = useState(false);
 
-  useEffect(() => {
+  const fetchLog = () => {
     api.get(`${ENDPOINTS.ACADEMIC_LOGS}${id}/`)
       .then(res => setLog(res.data))
-      .catch(() => {
-          // Systemic routing and retrieval anomalies are handled by the global HTTP interceptor.
-      });
-
-    api.get(ENDPOINTS.LOG_COMMENTS(id))
-      .then(res => setComments(Array.isArray(res.data) ? res.data : res.data?.results || []))
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchLog();
   }, [id]);
+
+  const comments = log?.comments || [];
 
   const handleComment = async () => {
     if (!comment.trim()) return;
     setPosting(true);
     try {
-      const res = await api.post(ENDPOINTS.LOG_COMMENTS(id), { content: comment });
-      setComments(prev => [...prev, res.data]);
+      await api.post(ENDPOINTS.LOG_COMMENTS(id), { comment: comment });
       setComment('');
       toast.success('Comment posted successfully.');
+      fetchLog();
     } catch {
       // Systemic routing errors handled by the global HTTP interceptor.
     } finally {
@@ -49,7 +48,7 @@ export default function SupervisorReviewLog() {
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ width: '100%' }}>
       <Btn variant="ghost" size="sm" onClick={() => navigate('/supervisor/pending-reviews')} style={{ marginBottom: 8 }}>
         &larr; Back to Logs
       </Btn>
@@ -107,9 +106,9 @@ export default function SupervisorReviewLog() {
                 marginBottom: 8,
               }}>
                 <div style={{ fontSize: 12, color: '#9A938D', marginBottom: 4 }}>
-                  {c.author?.full_name || 'Supervisor'} — {formatDate(c.created_at)}
+                  {c.author_name || 'Supervisor'} — {formatDate(c.created_at)}
                 </div>
-                <div style={{ fontSize: 14, color: '#1A1714', whiteSpace: 'pre-wrap' }}>{c.content || c.comment}</div>
+                <div style={{ fontSize: 14, color: '#1A1714', whiteSpace: 'pre-wrap' }}>{c.comment}</div>
               </div>
             ))}
           </div>

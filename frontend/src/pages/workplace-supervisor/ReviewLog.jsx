@@ -13,22 +13,21 @@ export default function WorkplaceReviewLog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [log, setLog] = useState(null);
-  const [comments, setComments] = useState([]);
   const [comment, setComment] = useState('');
   const [posting, setPosting] = useState(false);
   const [reviewing, setReviewing] = useState(false);
 
-  useEffect(() => {
+  const fetchLog = () => {
     api.get(`${ENDPOINTS.WP_LOGS}${id}/`)
       .then(res => setLog(res.data))
-      .catch(() => {
-        // Systemic routing and retrieval anomalies are handled by the global HTTP interceptor.
-      });
-
-    api.get(ENDPOINTS.LOG_COMMENTS(id))
-      .then(res => setComments(Array.isArray(res.data) ? res.data : res.data?.results || []))
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchLog();
   }, [id]);
+
+  const comments = log?.comments || [];
 
   const handleReview = async (action) => {
     if (action === 'reject' && !comment.trim()) {
@@ -52,10 +51,10 @@ export default function WorkplaceReviewLog() {
     if (!comment.trim()) return;
     setPosting(true);
     try {
-      const res = await api.post(ENDPOINTS.LOG_COMMENTS(id), { content: comment });
-      setComments(prev => [...prev, res.data]);
+      await api.post(ENDPOINTS.LOG_COMMENTS(id), { comment: comment });
       setComment('');
       toast.success('Comment posted successfully!');
+      fetchLog();
     } catch {
     } finally {
       setPosting(false);
@@ -67,7 +66,7 @@ export default function WorkplaceReviewLog() {
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ width: '100%' }}>
       <Btn variant="ghost" size="sm" onClick={() => navigate('/workplace/logs')} style={{ marginBottom: 8 }}>
         &larr; Back to Logs
       </Btn>
@@ -122,9 +121,9 @@ export default function WorkplaceReviewLog() {
                 padding: '10px 12px', background: '#F0EDE8', borderRadius: 8, marginBottom: 8,
               }}>
                 <div style={{ fontSize: 12, color: '#9A938D', marginBottom: 4 }}>
-                  {c.author?.full_name || 'Supervisor'} — {formatDate(c.created_at)}
+                  {c.author_name || 'Supervisor'} — {formatDate(c.created_at)}
                 </div>
-                <div style={{ fontSize: 14, color: '#1A1714', whiteSpace: 'pre-wrap' }}>{c.content || c.comment}</div>
+                <div style={{ fontSize: 14, color: '#1A1714', whiteSpace: 'pre-wrap' }}>{c.comment}</div>
               </div>
             ))}
           </div>
