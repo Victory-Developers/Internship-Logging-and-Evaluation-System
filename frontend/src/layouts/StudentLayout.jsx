@@ -40,6 +40,9 @@ return (
         <NavLink to="/student/logs/new" className="sidebar-cta-btn">
             + Submit Log
         </NavLink>
+        <NavLink to="/student/submit-report" className="sidebar-cta-btn" style={{ background: 'var(--color-primary-container, #E8F4FD)', color: 'var(--color-on-primary-container, #1A6FA8)', marginTop: 8, border: '1px solid #1A6FA840' }}>
+            Submit Report
+        </NavLink>
         <NavLink to="/student/profile" className="sidebar-profile-link">
             My Profile
         </NavLink>

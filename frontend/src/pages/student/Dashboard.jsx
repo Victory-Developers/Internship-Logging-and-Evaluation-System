@@ -42,6 +42,37 @@ function getStatusColors(status) {
   }
 }
 
+function getTimeUntilFriday() {
+  const now = new Date()
+  const currentDay = now.getDay()
+  
+  // Friday is 5. 
+  let daysToAdd = 5 - currentDay
+  if (daysToAdd < 0) {
+    daysToAdd += 7 // Already Saturday/Sunday
+  } else if (daysToAdd === 0) {
+    // It's Friday, check if past 5:00 PM (17:00)
+    const targetToday = new Date(now)
+    targetToday.setHours(17, 0, 0, 0)
+    if (now > targetToday) {
+      daysToAdd = 7
+    }
+  }
+  
+  const nextFriday = new Date(now)
+  nextFriday.setDate(now.getDate() + daysToAdd)
+  nextFriday.setHours(17, 0, 0, 0)
+  
+  const diffMs = nextFriday - now
+  if (diffMs <= 0) return { days: 0, hours: 0, minutes: 0 }
+  
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+  
+  return { days, hours, minutes }
+}
+
 function formatStatus(status) {
   if (!status) return 'Unknown'
   return status.charAt(0).toUpperCase() + status.slice(1)
@@ -214,6 +245,9 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(null)
   const [submitting, setSubmitting] = useState(null)
+  const [placement, setPlacement] = useState(null)
+  const [loadingPlacement, setLoadingPlacement] = useState(true)
+  const [timeLeft, setTimeLeft] = useState(getTimeUntilFriday())
 
   const fetchLogs = useCallback(async () => {
     try {
@@ -228,9 +262,31 @@ export default function StudentDashboard() {
     }
   }, [])
 
+  const fetchPlacement = useCallback(async () => {
+    try {
+      setLoadingPlacement(true)
+      const { data } = await api.get(ENDPOINTS.MY_PLACEMENT)
+      setPlacement(data)
+    } catch (err) {
+      if (err.response?.status === 404) {
+        setPlacement(null)
+      }
+    } finally {
+      setLoadingPlacement(false)
+    }
+  }, [])
+
   useEffect(() => {
     fetchLogs()
-  }, [fetchLogs])
+    fetchPlacement()
+  }, [fetchLogs, fetchPlacement])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(getTimeUntilFriday())
+    }, 60000)
+    return () => clearInterval(timer)
+  }, [])
 
   async function handleSubmit(id) {
     setSubmitting(id)
@@ -287,6 +343,127 @@ export default function StudentDashboard() {
             Here is an overview of your weekly internship logging progress.
           </p>
         </div>
+
+        {/* Placement Reminders */}
+        {!loadingPlacement && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+            {placement === null && (
+              <div style={{
+                background: '#FEF3C7',
+                border: '1px solid #FCD34D',
+                borderRadius: 12,
+                padding: '1rem 1.25rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '1rem',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ fontSize: 24 }}>⚠️</span>
+                  <div>
+                    <div style={{ fontWeight: 700, color: '#92400E', fontSize: 14 }}>Placement Request Required</div>
+                    <div style={{ color: '#B45309', fontSize: 13, marginTop: 2 }}>Please submit your internship placement request to assign supervisors and start logging.</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/student/placement')}
+                  style={{
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '0.5rem 1rem',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    background: '#D97706',
+                    color: '#ffffff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Submit Request
+                </button>
+              </div>
+            )}
+
+            {placement && placement.status === 'active' && !placement.workplace_supervisor && !placement.invited_supervisor_email && (
+              <div style={{
+                background: '#FEF3C7',
+                border: '1px solid #FCD34D',
+                borderRadius: 12,
+                padding: '1rem 1.25rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '1rem',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ fontSize: 24 }}>💼</span>
+                  <div>
+                    <div style={{ fontWeight: 700, color: '#92400E', fontSize: 14 }}>Workplace Supervisor Missing</div>
+                    <div style={{ color: '#B45309', fontSize: 13, marginTop: 2 }}>You haven't added a workplace supervisor yet. Please update your placement to ensure your logs can be reviewed.</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/student/placement')}
+                  style={{
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '0.5rem 1rem',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    background: '#D97706',
+                    color: '#ffffff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Add Supervisor
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Countdown to Friday */}
+        {placement && placement.status === 'active' && new Date() < new Date(placement.end_date) && (
+          <div style={{
+            background: 'linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)',
+            color: '#ffffff',
+            borderRadius: 12,
+            padding: '1.25rem 1.5rem',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+          }}>
+            <div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#ffffff' }}>Weekly Log Submission Countdown</h3>
+              <p style={{ fontSize: 13, color: '#DBEAFE', margin: '4px 0 0 0' }}>Submit your weekly progress logs by Friday 5:00 PM.</p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              {[
+                { label: 'Days', value: timeLeft.days },
+                { label: 'Hrs', value: timeLeft.hours },
+                { label: 'Mins', value: timeLeft.minutes }
+              ].map(t => (
+                <div key={t.label} style={{
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(4px)',
+                  borderRadius: 8,
+                  padding: '8px 12px',
+                  minWidth: 54,
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{t.value}</div>
+                  <div style={{ fontSize: 10, color: '#BFDBFE', fontWeight: 600, marginTop: 4, textTransform: 'uppercase' }}>{t.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div
           style={{
             display: 'grid',
