@@ -40,7 +40,35 @@ export default function SupervisorDashboard() {
         <p style={{ color: 'var(--on-surface-variant, #5c5752)', marginBottom: '30px' }}>Overview of student evaluations and placement progress</p>
 
         {loading ? (
-          <p>Loading dashboard...</p>
+          <>
+            {/* 🔹 STATS SECTION SKELETON */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} style={cardStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div className="skeleton-box" style={{ width: 32, height: 32, borderRadius: '50%', marginRight: '16px' }} />
+                    <div style={{ flex: 1 }}>
+                      <div className="skeleton-box" style={{ height: '14px', width: '65%', marginBottom: '8px' }} />
+                      <div className="skeleton-box" style={{ height: '28px', width: '35%' }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 🔹 RECENT ACTIVITY SKELETON */}
+            <div style={{ background: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+              <div className="skeleton-box" style={{ height: '24px', width: '150px', marginBottom: '20px' }} />
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {[1, 2, 3, 4, 5].map((idx) => (
+                  <li key={idx} style={{ padding: '15px 0', borderBottom: idx < 5 ? '1px solid #eee' : 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="skeleton-box" style={{ height: '16px', width: '50%' }} />
+                    <div className="skeleton-box" style={{ height: '12px', width: '80px' }} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
         ) : (
           <>
             {/* 🔹 STATS SECTION */}
