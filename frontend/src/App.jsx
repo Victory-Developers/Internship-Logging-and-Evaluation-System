@@ -128,6 +128,7 @@ export default function App() {
         <Route path="users" element={<AdminUsers />} />
         <Route path="placements" element={<AdminPlacements />} />
         <Route path="placements/new" element={<AdminCreatePlacement />} />
+        <Route path="reports" element={<AdminReports />} />
         <Route path="logs" element={<AdminLogs />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route index element={<Navigate to="dashboard" replace />} />
