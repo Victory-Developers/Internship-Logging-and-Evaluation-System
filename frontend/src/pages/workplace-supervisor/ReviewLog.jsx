@@ -18,7 +18,7 @@ export default function WorkplaceReviewLog() {
   const [reviewing, setReviewing] = useState(false);
 
   const fetchLog = () => {
-    api.get(`${ENDPOINTS.WP_LOGS}${id}/`)
+    api.get(ENDPOINTS.LOG_DETAIL(id))
       .then(res => setLog(res.data))
       .catch(() => {});
   };

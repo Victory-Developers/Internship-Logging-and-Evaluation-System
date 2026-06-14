@@ -336,12 +336,12 @@ class AcademicSupervisorDashboardView(APIView):
         # Recent evaluations
         recent_evals = AcademicEvaluation.objects.filter(
             placement__academic_supervisor=request.user
-        ).select_related('placement__student').order_by('-created_at')[:5]
+        ).select_related('placement__student').order_by('-submitted_at')[:5]
         
         for eval in recent_evals:
             recent_activity.append({
                 'description': f'Academic evaluation completed for {eval.placement.student.full_name}',
-                'time': eval.created_at.strftime('%Y-%m-%d %H:%M'),
+                'time': eval.submitted_at.strftime('%Y-%m-%d %H:%M'),
             })
 
         # Recent logs submitted

@@ -402,5 +402,37 @@ class AdminLogListView(generics.ListAPIView):
             qs = qs.filter(placement_id=placement_filter)
 
         return qs.order_by('-week_start')
+
+
+class LogDetailView(APIView):
+    """
+    GET /api/logs/<int:pk>/   — View a weekly log detail (Student, Workplace Supervisor, Academic Supervisor, Admin)
+    """
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={200: WeeklyLogSerializer},
+        description='Get details of a weekly log (accessible by Student, assigned Supervisors, or Admin).',
+        tags=['Weekly Logs — Detail'],
+    )
+    def get(self, request, pk):
+        try:
+            log = WeeklyLog.objects.select_related('placement').prefetch_related('comments__author').get(pk=pk)
+        except WeeklyLog.DoesNotExist:
+            return Response({'detail': 'Log not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check permissions
+        placement = log.placement
+        user = request.user
+        allowed = (
+            user == log.student or
+            user.role == 'admin' or
+            (user.role == 'workplace_supervisor' and placement.workplace_supervisor == user) or
+            (user.role == 'academic_supervisor' and placement.academic_supervisor == user)
+        )
+        if not allowed:
+            return Response({'detail': 'You are not authorized to view this log.'}, status=status.HTTP_403_FORBIDDEN)
+
+        return Response(WeeklyLogSerializer(log).data)
 # ...
 # ...
