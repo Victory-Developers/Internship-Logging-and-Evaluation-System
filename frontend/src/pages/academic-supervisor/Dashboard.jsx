@@ -34,56 +34,74 @@ export default function SupervisorDashboard() {
   }, [])
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f5f5' }}>
-      {/* MAIN AREA */}
-      <div style={{ padding: '30px', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '10px', color: '#333' }}>Academic Supervisor Dashboard</h1>
-        <p style={{ color: '#666', marginBottom: '30px' }}>Overview of student evaluations and placement progress</p>
+    <div style={{ width: '100%' }}>
+      <div style={{ padding: '10px 0', width: '100%' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 'bold', marginBottom: '10px', color: 'var(--on-surface, #1A1714)' }}>Academic Supervisor Dashboard</h1>
+        <p style={{ color: 'var(--on-surface-variant, #5c5752)', marginBottom: '30px' }}>Overview of student evaluations and placement progress</p>
 
         {loading ? (
           <p>Loading dashboard...</p>
         ) : (
           <>
             {/* 🔹 STATS SECTION */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '30px' }}>
               
               <div style={cardStyle}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '2em', marginRight: '10px' }}>👨‍🎓</span>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #002452)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '16px' }}>
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>Assigned Students</h3>
-                    <p style={{ margin: 0, fontSize: '1.8em', fontWeight: 'bold', color: 'white' }}>{stats.total_students}</p>
+                    <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--on-surface-variant, #5c5752)', fontWeight: 500 }}>Assigned Students</h3>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '28px', fontWeight: 700, color: 'var(--on-surface, #1A1714)' }}>{stats.total_students}</p>
                   </div>
                 </div>
               </div>
 
               <div style={cardStyle}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '2em', marginRight: '10px' }}>📋</span>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>Pending Reviews</h3>
-                    <p style={{ margin: 0, fontSize: '1.8em', fontWeight: 'bold', color: 'white' }}>{stats.pending_reviews}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #002452)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '16px' }}>
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--on-surface-variant, #5c5752)', fontWeight: 500 }}>Pending Reviews</h3>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '28px', fontWeight: 700, color: 'var(--on-surface, #1A1714)' }}>{stats.pending_reviews}</p>
+                    </div>
                   </div>
-                </div>
-                <button style={buttonStyle} onClick={() => navigate('/supervisor/reviews')}>Review Now</button>
-              </div>
-
-              <div style={cardStyle}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '2em', marginRight: '10px' }}>✅</span>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>Completed Evaluations</h3>
-                    <p style={{ margin: 0, fontSize: '1.8em', fontWeight: 'bold', color: 'white' }}>{stats.completed_evaluations}</p>
-                  </div>
+                  <button style={buttonStyle} onClick={() => navigate('/supervisor/pending-reviews')}>Review Now</button>
                 </div>
               </div>
 
               <div style={cardStyle}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '2em', marginRight: '10px' }}>🏢</span>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #002452)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '16px' }}>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>Active Placements</h3>
-                    <p style={{ margin: 0, fontSize: '1.8em', fontWeight: 'bold', color: 'white' }}>{stats.active_placements}</p>
+                    <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--on-surface-variant, #5c5752)', fontWeight: 500 }}>Completed Evaluations</h3>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '28px', fontWeight: 700, color: 'var(--on-surface, #1A1714)' }}>{stats.completed_evaluations}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={cardStyle}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #002452)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '16px' }}>
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--on-surface-variant, #5c5752)', fontWeight: 500 }}>Active Placements</h3>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '28px', fontWeight: 700, color: 'var(--on-surface, #1A1714)' }}>{stats.active_placements}</p>
                   </div>
                 </div>
               </div>
@@ -116,23 +134,23 @@ export default function SupervisorDashboard() {
 
 // 🔹 Card styling
 const cardStyle = {
-  padding: '20px',
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  color: 'white',
-  borderRadius: '15px',
-  boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+  padding: '24px',
+  background: 'var(--surface-container-high, #e5e6fe)',
+  border: '1px solid var(--outline-variant, #dfe1f9)',
+  borderRadius: '12px',
   textAlign: 'left',
-  transition: 'transform 0.2s',
 }
 
 const buttonStyle = {
-  background: 'rgba(255,255,255,0.2)',
-  color: 'white',
+  background: 'var(--primary, #002452)',
+  color: 'var(--on-primary, #ffffff)',
   border: 'none',
   padding: '8px 16px',
   borderRadius: '8px',
   cursor: 'pointer',
-  fontSize: '0.9em',
-  marginTop: '10px',
-  transition: 'background 0.2s',
+  fontSize: '14px',
+  fontWeight: 600,
+  marginTop: '16px',
+  alignSelf: 'flex-start',
+  transition: 'opacity 0.2s',
 }

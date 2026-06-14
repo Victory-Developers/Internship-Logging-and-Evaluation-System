@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import logoImg from '../assets/Gemini_Generated_Image_sb9z89sb9z89sb9z.png';
 import '../styles/layout.css';
 
 export default function SupervisorLayout() {
@@ -16,9 +17,9 @@ return (
     <aside className="sidebar sidebar-supervisor">
 
         <div className="sidebar-brand">
+        <img src={logoImg} alt="ILES Logo" className="sidebar-brand-icon" style={{ objectFit: 'contain' }} />
         <div>
-            <div className="sidebar-brand-text">Makerere</div>
-            <div className="sidebar-brand-text">University</div>
+            <div className="sidebar-brand-text">ILES</div>
             <div className="sidebar-brand-subtitle">Academic Supervisor</div>
         </div>
         </div>
