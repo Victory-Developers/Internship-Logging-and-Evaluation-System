@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import api from "../../api/axios";
 import {
   Navbar, PageLayout, PageBody, Card, Btn, StatusBadge,
-  Modal, Spinner, EmptyState, Field, Textarea, Select, toast
+  Modal, Spinner, EmptyState, Field, Textarea, Select
 } from '../../components/UI'
 
 export default function SupervisorDashboard() {

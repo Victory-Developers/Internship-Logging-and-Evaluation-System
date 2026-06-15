@@ -5,10 +5,10 @@ const BYPASS_AUTH = String(import.meta.env.VITE_BYPASS_AUTH).toLowerCase() === '
 
 export default function ProtectedRoute({ children, allowedRoles }) {
 
-  // Dev/demo bypass: allow direct route access when flag is enabled.
-  if (BYPASS_AUTH) return children;
+  const { isAuthenticated, loading, user } = useAuth();
 
-  const { isAuthenticated, loading, user } = useAuth();                       
+  // Dev/demo bypass: allow direct route access when flag is enabled.
+  if (BYPASS_AUTH) return children;                       
                                                                             
     // Still checking if there's a saved token — show nothing yet               
     if (loading) {                                                              

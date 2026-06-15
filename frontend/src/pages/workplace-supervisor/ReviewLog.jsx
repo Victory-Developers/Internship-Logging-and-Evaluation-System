@@ -41,7 +41,8 @@ export default function WorkplaceReviewLog() {
       await api.post(ENDPOINTS.WP_LOG_REVIEW(id), payload);
       toast.success(`Log has been ${action === 'approve' ? 'approved' : 'rejected'} successfully.`);
       navigate('/workplace/logs');
-    } catch (err) {
+    } catch {
+      // Errors handled by global interceptor
     } finally {
       setReviewing(false);
     }
@@ -56,6 +57,7 @@ export default function WorkplaceReviewLog() {
       toast.success('Comment posted successfully!');
       fetchLog();
     } catch {
+      // Errors handled by global interceptor
     } finally {
       setPosting(false);
     }

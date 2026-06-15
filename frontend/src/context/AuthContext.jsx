@@ -57,7 +57,7 @@ export function AuthProvider({ children }) {
       try {
         const response = await api.get(ENDPOINTS.PROFILE);
         dispatch({ type: 'LOGIN', payload: { user: response.data } });
-      } catch (error) {
+      } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         dispatch({ type: 'LOGOUT' });
@@ -93,7 +93,7 @@ export function AuthProvider({ children }) {
 
     try {
       await api.post(ENDPOINTS.LOGOUT, { refresh: refreshToken });
-    } catch (error) {
+    } catch {
       // ignore errors
     }
 
@@ -114,7 +114,7 @@ export function AuthProvider({ children }) {
         payload: { user: response.data },
       });
       return response.data;
-    } catch (error) {
+    } catch {
       // ignore errors
     }
   };
@@ -135,6 +135,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   return useContext(AuthContext);
 };

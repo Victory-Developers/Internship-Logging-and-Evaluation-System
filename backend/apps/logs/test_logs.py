@@ -8,7 +8,7 @@ from datetime import date
 from django.utils import timezone
 
 @pytest.fixture
-def test_setup():
+def test_setup(db):
     # Setup users
     student = CustomUser.objects.create_user(
         email='student@example.com', password='password123', full_name='Student User', role='student', status='active'
